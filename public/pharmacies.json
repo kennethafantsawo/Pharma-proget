@@ -1,0 +1,59 @@
+
+[
+  {
+    "semaine": "24/06/2024 au 30/06/2024",
+    "pharmacies": [
+      {
+        "nom": "PHARMACIE DE L'OCEAN",
+        "localisation": "Boulevard du 13 Janvier",
+        "contact1": "90112233",
+        "contact2": "97112233"
+      },
+      {
+        "nom": "PHARMACIE SAINT-ESPRIT",
+        "localisation": "Rue des Apotres",
+        "contact1": "91223344",
+        "contact2": "96223344"
+      }
+    ]
+  },
+  {
+    "semaine": "01/07/2024 au 07/07/2024",
+    "pharmacies": [
+      {
+        "nom": "PHARMACIE MAJOR",
+        "localisation": "Avenue centrale",
+        "contact1": "90220000",
+        "contact2": "97220000"
+      }
+    ]
+  },
+  {
+    "semaine": "08/07/2024 au 14/07/2024",
+    "pharmacies": [
+      {
+        "nom": "PHARMACIE LA GRACE",
+        "localisation": "Place de la Victoire",
+        "contact1": "92334455",
+        "contact2": "98334455"
+      },
+      {
+        "nom": "PHARMACIE DU PORT",
+        "localisation": "Zone portuaire, Magasin 3",
+        "contact1": "93445566",
+        "contact2": "99445566"
+      }
+    ]
+  },
+  {
+    "semaine": "15/07/2024 au 21/07/2024",
+    "pharmacies": [
+      {
+        "nom": "PHARMACIE LE PHENIX",
+        "localisation": "Avenue de la Liberation",
+        "contact1": "90556677",
+        "contact2": "96556677"
+      }
+    ]
+  }
+]
