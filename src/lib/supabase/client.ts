@@ -29,8 +29,12 @@ export type Database = {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL and/or anonymous key are not defined in .env file')
-}
+// Initialize client only if variables are set to prevent crashing the app.
+export const supabase = 
+    (supabaseUrl && supabaseAnonKey) 
+        ? createClient<Database>(supabaseUrl, supabaseAnonKey) 
+        : null;
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+if (!supabase) {
+    console.warn('Supabase client is not initialized. Please check your environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+}

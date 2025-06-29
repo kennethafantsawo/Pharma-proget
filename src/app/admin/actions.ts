@@ -5,6 +5,11 @@ import type { WeekSchedule } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
 export async function updatePharmaciesAction(password: string, newSchedules: WeekSchedule[]): Promise<{ success: boolean; message: string }> {
+  // Check for Supabase admin client initialization first
+  if (!supabaseAdmin) {
+    return { success: false, message: "Échec de la connexion à la base de données : la configuration côté serveur est manquante." }
+  }
+
   // This is a basic password check and is not secure for production.
   // In a real application, you should use a proper authentication system like Supabase Auth.
   if (password !== 'kenneth18') {

@@ -31,6 +31,14 @@ export const usePharmacies = () => {
     const loadData = async () => {
       setLoading(true);
       setError(null);
+
+      if (!supabase) {
+        setError("Configuration Supabase manquante. Veuillez créer un fichier .env.local avec les variables d'environnement nécessaires.");
+        setData([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         // Fetch data from Supabase instead of a JSON file
         const { data: schedules, error: fetchError } = await supabase
@@ -60,23 +68,31 @@ export const usePharmacies = () => {
     loadData();
   }, [findCurrentWeekIndex]);
 
-  const goToWeek = (index: number) => {
+  const goToWeek = useCallback((index: number) => {
     if (index >= 0 && index < data.length) {
       setCurrentWeekIndex(index);
     }
-  };
+  }, [data.length]);
 
-  const goToNextWeek = () => {
-    if (currentWeekIndex < data.length - 1) {
-      setCurrentWeekIndex(prev => prev + 1);
-    }
-  };
+  const goToNextWeek = useCallback(() => {
+    setCurrentWeekIndex(prevIndex => {
+      const nextIndex = prevIndex + 1;
+      if (nextIndex < data.length) {
+        return nextIndex;
+      }
+      return prevIndex;
+    });
+  }, [data.length]);
 
-  const goToPrevWeek = () => {
-    if (currentWeekIndex > 0) {
-      setCurrentWeekIndex(prev => prev - 1);
-    }
-  };
+  const goToPrevWeek = useCallback(() => {
+    setCurrentWeekIndex(prevIndex => {
+      const prevIndexValue = prevIndex - 1;
+      if (prevIndexValue >= 0) {
+        return prevIndexValue;
+      }
+      return prevIndex;
+    });
+  }, []);
 
   return {
     data,
