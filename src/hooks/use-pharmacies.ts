@@ -4,8 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { type WeekSchedule } from '@/lib/types';
 import { isDateInWeek } from '@/lib/date-utils';
-
-const PHARMACIES_STORAGE_KEY = 'pharmaguard_pharmacies_data';
+import { supabase } from '@/lib/supabase/client';
 
 export const usePharmacies = () => {
   const [data, setData] = useState<WeekSchedule[]>([]);
@@ -33,33 +32,25 @@ export const usePharmacies = () => {
       setLoading(true);
       setError(null);
       try {
-        let schedules: WeekSchedule[] | null = null;
+        // Fetch data from Supabase instead of a JSON file
+        const { data: schedules, error: fetchError } = await supabase
+            .from('weeks')
+            .select('semaine, pharmacies(nom, localisation, contact1, contact2)')
+            .order('semaine', { ascending: true });
         
-        // Try to load from localStorage first
-        const storedData = localStorage.getItem(PHARMACIES_STORAGE_KEY);
-        if (storedData) {
-          schedules = JSON.parse(storedData);
-        } else {
-          // Fetch from public file if not in localStorage
-          const response = await fetch('/pharmacies.json');
-          if (!response.ok) {
-            throw new Error('Failed to fetch pharmacy data');
-          }
-          schedules = await response.json();
-          // Cache the fetched data
-          if (schedules) {
-            localStorage.setItem(PHARMACIES_STORAGE_KEY, JSON.stringify(schedules));
-          }
+        if (fetchError) {
+            throw fetchError;
         }
 
         if (schedules && Array.isArray(schedules)) {
-          setData(schedules);
-          setCurrentWeekIndex(findCurrentWeekIndex(schedules));
+          // The data from Supabase should match the WeekSchedule structure
+          setData(schedules as WeekSchedule[]);
+          setCurrentWeekIndex(findCurrentWeekIndex(schedules as WeekSchedule[]));
         } else {
-          throw new Error('Invalid data format');
+          throw new Error('Invalid data format from Supabase');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching data.');
         console.error(err);
       } finally {
         setLoading(false);
@@ -67,18 +58,6 @@ export const usePharmacies = () => {
     };
 
     loadData();
-  }, [findCurrentWeekIndex]);
-
-  const updatePharmacies = useCallback((newSchedules: WeekSchedule[]) => {
-    try {
-      setData(newSchedules);
-      localStorage.setItem(PHARMACIES_STORAGE_KEY, JSON.stringify(newSchedules));
-      setCurrentWeekIndex(findCurrentWeekIndex(newSchedules));
-      setError(null);
-    } catch (err) {
-      setError('Failed to update and save new pharmacy data.');
-      console.error(err);
-    }
   }, [findCurrentWeekIndex]);
 
   const goToWeek = (index: number) => {
@@ -105,7 +84,6 @@ export const usePharmacies = () => {
     error,
     currentWeekIndex,
     currentSchedule: data[currentWeekIndex],
-    updatePharmacies,
     goToWeek,
     goToNextWeek,
     goToPrevWeek,

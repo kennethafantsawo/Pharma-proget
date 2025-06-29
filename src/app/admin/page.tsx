@@ -1,19 +1,20 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition, type ChangeEvent } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePharmacies } from '@/hooks/use-pharmacies';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast"
-import { Lock, FileUp, Settings, LogOut, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Lock, Settings, LogOut, CheckCircle, AlertTriangle, LoaderCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { WeekSchedule } from '@/lib/types';
+import { updatePharmaciesAction } from './actions';
 
 // Schema for login form
 const LoginSchema = z.object({
@@ -22,16 +23,14 @@ const LoginSchema = z.object({
 type LoginValues = z.infer<typeof LoginSchema>;
 
 // Admin Panel Component
-const AdminPanel = ({ onLogout }: { onLogout: () => void }) => {
-  const { updatePharmacies } = usePharmacies();
+const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: string }) => {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -40,25 +39,32 @@ const AdminPanel = ({ onLogout }: { onLogout: () => void }) => {
         
         const jsonData = JSON.parse(text);
 
-        // Basic validation
         if (!Array.isArray(jsonData) || !jsonData.every(item => 'semaine' in item && 'pharmacies' in item)) {
             throw new Error("Le fichier JSON n'a pas la structure attendue.");
         }
         
-        updatePharmacies(jsonData as WeekSchedule[]);
-        toast({
-          title: "Succès",
-          description: "Le fichier des pharmacies a été mis à jour.",
-          variant: 'default',
+        startTransition(async () => {
+          const result = await updatePharmaciesAction(password, jsonData as WeekSchedule[]);
+          if (result.success) {
+            toast({
+              title: "Succès",
+              description: result.message,
+            });
+          } else {
+            toast({
+              title: "Erreur",
+              description: result.message,
+              variant: "destructive",
+            });
+          }
         });
+
       } catch (error) {
         toast({
           title: "Erreur de Fichier",
           description: error instanceof Error ? error.message : "Un problème est survenu lors du traitement du fichier.",
           variant: "destructive",
         });
-      } finally {
-        setIsUploading(false);
       }
     };
     reader.onerror = () => {
@@ -67,7 +73,6 @@ const AdminPanel = ({ onLogout }: { onLogout: () => void }) => {
             description: "Impossible de lire le fichier.",
             variant: "destructive",
         });
-        setIsUploading(false);
     }
     reader.readAsText(file);
     event.target.value = ''; // Reset input
@@ -81,20 +86,25 @@ const AdminPanel = ({ onLogout }: { onLogout: () => void }) => {
           <Button variant="ghost" size="sm" onClick={onLogout}><LogOut className="mr-2 h-4 w-4"/>Se déconnecter</Button>
         </CardTitle>
         <CardDescription>
-          Remplacez le fichier des pharmacies de garde. Le nouveau fichier sera utilisé immédiatement et mis en cache pour une utilisation hors ligne.
+          Remplacez les données des pharmacies de garde en chargeant un nouveau fichier. Les modifications seront visibles par tous les utilisateurs.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <Label htmlFor="pharmacy-file">Nouveau fichier pharmacies.json</Label>
-          <Input id="pharmacy-file" type="file" accept=".json" onChange={handleFileChange} disabled={isUploading} />
-          {isUploading && <p className="text-sm text-muted-foreground">Téléchargement en cours...</p>}
+          <Input id="pharmacy-file" type="file" accept=".json" onChange={handleFileChange} disabled={isPending} />
+          {isPending && 
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <LoaderCircle className="animate-spin h-4 w-4" /> 
+              Mise à jour en cours...
+            </p>
+          }
         </div>
         <Alert className="mt-4">
           <CheckCircle className="h-4 w-4"/>
           <AlertTitle>Important</AlertTitle>
           <AlertDescription>
-            Assurez-vous que le fichier JSON est valide et correctement formaté. Les modifications sont locales à votre appareil.
+            Assurez-vous que le fichier JSON est valide. Le chargement peut prendre quelques secondes. La page d'accueil sera mise à jour automatiquement.
           </AlertDescription>
         </Alert>
       </CardContent>
@@ -104,15 +114,16 @@ const AdminPanel = ({ onLogout }: { onLogout: () => void }) => {
 
 
 // Login Form Component
-const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
+const LoginForm = ({ onLogin }: { onLogin: (password: string) => void }) => {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginValues>({
         resolver: zodResolver(LoginSchema)
     });
     const { toast } = useToast();
 
     const onSubmit: SubmitHandler<LoginValues> = (data) => {
+        // This is not secure. In a real app, you would not handle passwords this way.
         if (data.password === 'kenneth18') {
-            onLogin();
+            onLogin(data.password);
             toast({ title: "Connexion réussie", description: "Bienvenue dans le panneau d'administration." });
         } else {
             toast({ title: "Erreur d'authentification", description: "Mot de passe incorrect.", variant: "destructive" });
@@ -143,16 +154,23 @@ const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
 // Main Page Component
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  const handleLogin = (pass: string) => {
+    setPassword(pass);
+    setIsLoggedIn(true);
+  };
+  const handleLogout = () => {
+    setPassword('');
+    setIsLoggedIn(false);
+  };
 
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="max-w-2xl mx-auto">
           {isLoggedIn ? (
-            <AdminPanel onLogout={handleLogout} />
+            <AdminPanel onLogout={handleLogout} password={password} />
           ) : (
             <LoginForm onLogin={handleLogin} />
           )}
