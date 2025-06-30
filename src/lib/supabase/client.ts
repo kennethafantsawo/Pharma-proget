@@ -43,6 +43,30 @@ export type Database = {
           image_url?: string | null;
           likes?: number;
         }
+      },
+      health_post_comments: {
+        Row: {
+          id: number;
+          post_id: number;
+          content: string;
+          created_at: string;
+        },
+        Insert: {
+          post_id: number;
+          content: string;
+        }
+      },
+      user_feedback: {
+        Row: {
+          id: number;
+          type: string;
+          content: string;
+          created_at: string;
+        },
+        Insert: {
+          type: string;
+          content: string;
+        }
       }
     }
     Functions: {

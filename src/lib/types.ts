@@ -19,3 +19,10 @@ export interface HealthPost {
   created_at: string;
   likes: number;
 }
+
+export interface HealthPostComment {
+    id: number;
+    post_id: number;
+    content: string;
+    created_at: string;
+}

@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, PlusSquare, BookOpen, Pill } from 'lucide-react';
+import { Menu, PlusSquare, BookOpen, Pill, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 
 const navLinks = [
   { href: '/', label: 'Pharmacies', icon: Pill },
   { href: '/health-library', label: 'Fiches Santé', icon: BookOpen },
+  { href: '/feedback', label: 'Avis', icon: Star },
   { href: '/admin', label: 'Options' },
 ];
 

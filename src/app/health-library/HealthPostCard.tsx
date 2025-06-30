@@ -5,10 +5,12 @@ import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ThumbsUp, MessageCircle, Share2, LoaderCircle } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HealthPost } from '@/lib/types'
 import { useToast } from '@/hooks/use-toast'
 import { incrementLikeAction } from './actions'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { CommentSection } from './CommentSection'
 
 interface HealthPostCardProps {
   post: HealthPost
@@ -16,9 +18,10 @@ interface HealthPostCardProps {
 
 export function HealthPostCard({ post }: HealthPostCardProps) {
   const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
+  const [isLikePending, startLikeTransition] = useTransition()
   const [likes, setLikes] = useState(post.likes)
   const [isLiked, setIsLiked] = useState(false)
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -33,9 +36,9 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
   }, [post.id])
 
   const handleLike = () => {
-    if (isLiked || isPending) return
+    if (isLiked || isLikePending) return
 
-    startTransition(async () => {
+    startLikeTransition(async () => {
       // Optimistic UI updates
       setIsLiked(true)
       setLikes(prev => prev + 1)
@@ -89,47 +92,62 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
 
   return (
     <Card id={`post-${post.id}`} className="w-full scroll-mt-20">
-      <CardHeader>
-        <CardTitle>{post.title}</CardTitle>
-        <CardDescription>
-          Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {post.image_url && (
-          <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden">
-            <Image
-              src={post.image_url}
-              alt={post.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          </div>
-        )}
-        <p className="text-base text-foreground/90 whitespace-pre-wrap">{post.content}</p>
-      </CardContent>
-      <CardFooter className="flex justify-start gap-1 sm:gap-4">
-        <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLiked || isPending} className="text-muted-foreground">
-          {isPending ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'text-primary fill-primary' : ''}`} />}
-          {likes} J'aime
-        </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-                <MessageCircle className="mr-2 h-4 w-4" /> Commenter
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Prochainement disponible</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleShare}>
-            <Share2 className="mr-2 h-4 w-4" /> Partager
-        </Button>
-      </CardFooter>
+      <Collapsible onOpenChange={setIsCommentsOpen}>
+        <CardHeader>
+          <CardTitle>{post.title}</CardTitle>
+          <CardDescription>
+            Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {post.image_url && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden cursor-pointer">
+                  <Image
+                    src={post.image_url}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+              </DialogTrigger>
+              <DialogContent className="p-0 border-0 max-w-4xl bg-transparent">
+                  <div className="relative aspect-video w-full">
+                     <Image
+                        src={post.image_url}
+                        alt={post.title}
+                        fill
+                        className="object-contain"
+                    />
+                  </div>
+              </DialogContent>
+            </Dialog>
+          )}
+          <p className="text-base text-foreground/90 whitespace-pre-wrap">{post.content}</p>
+        </CardContent>
+        <CardFooter className="flex justify-start gap-1 sm:gap-4">
+          <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLiked || isLikePending} className="text-muted-foreground">
+            {isLikePending ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'text-primary fill-primary' : ''}`} />}
+            {likes} J'aime
+          </Button>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <MessageCircle className="mr-2 h-4 w-4" /> Commenter
+            </Button>
+          </CollapsibleTrigger>
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleShare}>
+              <Share2 className="mr-2 h-4 w-4" /> Partager
+          </Button>
+        </CardFooter>
+        
+        <CollapsibleContent>
+           <CardContent>
+             {isCommentsOpen && <CommentSection postId={post.id} />}
+           </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   )
 }
