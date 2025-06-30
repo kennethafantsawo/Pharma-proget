@@ -1,13 +1,10 @@
 
 import { supabase } from '@/lib/supabase/client';
 import { PageWrapper } from '@/components/shared/page-wrapper';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookOpen, AlertCircle, ThumbsUp, MessageCircle, Share2 } from 'lucide-react';
-import Image from 'next/image';
+import { BookOpen, AlertCircle } from 'lucide-react';
 import { type HealthPost } from '@/lib/types';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HealthPostCard } from './HealthPostCard';
 
 async function getHealthPosts(): Promise<{ posts: HealthPost[] | null; error: string | null }> {
   if (!supabase) {
@@ -20,47 +17,11 @@ async function getHealthPosts(): Promise<{ posts: HealthPost[] | null; error: st
 
   if (error) {
     console.error("Error fetching health posts:", error);
-    return { posts: null, error: "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle ?" };
+    return { posts: null, error: "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle bien avec toutes ses colonnes (dont 'likes') ?" };
   }
   return { posts: data, error: null };
 }
 
-const PostActions = () => (
-  <CardFooter className="flex justify-start gap-4">
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-            <ThumbsUp className="mr-2 h-4 w-4" /> J'aime
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Prochainement disponible</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-            <MessageCircle className="mr-2 h-4 w-4" /> Commenter
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Prochainement disponible</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-            <Share2 className="mr-2 h-4 w-4" /> Partager
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Prochainement disponible</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  </CardFooter>
-);
 
 export default async function HealthLibraryPage() {
   const { posts, error } = await getHealthPosts();
@@ -88,29 +49,7 @@ export default async function HealthLibraryPage() {
           <div className="space-y-6">
             {posts && posts.length > 0 ? (
               posts.map(post => (
-                <Card key={post.id} className="w-full">
-                  <CardHeader>
-                    <CardTitle>{post.title}</CardTitle>
-                    <CardDescription>
-                      Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {post.image_url && (
-                      <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden">
-                        <Image 
-                            src={post.image_url} 
-                            alt={post.title} 
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <p className="text-base text-foreground/90 whitespace-pre-wrap">{post.content}</p>
-                  </CardContent>
-                  <PostActions />
-                </Card>
+                <HealthPostCard key={post.id} post={post} />
               ))
             ) : !error && (
               <Alert>

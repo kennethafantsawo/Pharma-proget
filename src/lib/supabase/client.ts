@@ -29,17 +29,28 @@ export type Database = {
           title: string;
           content: string;
           image_url: string | null;
+          likes: number;
         },
         Insert: {
           title: string;
           content: string;
           image_url?: string | null;
+          likes?: number;
         },
         Update: {
           title?: string;
           content?: string;
           image_url?: string | null;
+          likes?: number;
         }
+      }
+    }
+    Functions: {
+      increment_likes: {
+        Args: {
+          post_id_to_inc: number
+        }
+        Returns: undefined
       }
     }
   }
