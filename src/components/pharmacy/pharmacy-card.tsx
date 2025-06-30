@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Search } from 'lucide-react';
+import { Phone, MapPin } from 'lucide-react';
 import type { Pharmacy } from '@/lib/types';
 
 interface PharmacyCardProps {
@@ -49,7 +49,7 @@ export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
               className="text-primary hover:text-primary/80"
               title="Rechercher sur OpenStreetMap"
           >
-              <Search className="h-5 w-5"/>
+              <MapPin className="h-5 w-5"/>
           </a>
         </div>
         <div className="flex flex-wrap gap-2 pt-2">

@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import type { Pharmacy } from '@/lib/types';
 
 interface MapDisplayProps {
@@ -45,13 +45,13 @@ export function MapDisplay({ pharmacies, selectedPharmacyName }: MapDisplayProps
                         </div>
                     </div>
                     <a
-                        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(pharmacy.nom + ', ' + pharmacy.localisation)}`}
+                        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', ' + pharmacy.localisation)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                         title="Rechercher sur OpenStreetMap"
                     >
-                        <Search className="h-5 w-5"/>
+                        <MapPin className="h-5 w-5"/>
                     </a>
                 </li>
             ))}
