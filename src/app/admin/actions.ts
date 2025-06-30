@@ -64,7 +64,11 @@ export async function updatePharmaciesAction(password: string, newSchedules: Wee
     return { success: true, message: 'Les données des pharmacies ont été mises à jour avec succès.' }
   } catch (error) {
     console.error('Error in updatePharmaciesAction:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue.'
+    let errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue.'
+    // Provide a more helpful error message if a table is missing.
+    if (errorMessage.includes('does not exist')) {
+        errorMessage = `La table requise n'existe pas dans la base de données. Veuillez vérifier que vous avez bien exécuté le script SQL de création des tables. [Message original: ${errorMessage}]`
+    }
     return { success: false, message: `Échec de la mise à jour : ${errorMessage}` }
   }
 }
