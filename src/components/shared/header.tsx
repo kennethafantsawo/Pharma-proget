@@ -1,16 +1,16 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, PlusSquare } from 'lucide-react';
+import { Menu, PlusSquare, BookOpen, Pill } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 
 const navLinks = [
-  { href: '/', label: 'Accueil' },
+  { href: '/', label: 'Pharmacies', icon: Pill },
+  { href: '/health-library', label: 'Fiches Santé', icon: BookOpen },
   { href: '/admin', label: 'Options' },
 ];
 
@@ -18,7 +18,7 @@ export function Header() {
   const pathname = usePathname();
 
   const NavLinks = ({ inSheet = false }: { inSheet?: boolean }) => (
-    navLinks.map(({ href, label }) => (
+    navLinks.map(({ href, label, icon: Icon }) => (
       <Button
         key={href}
         variant="ghost"
@@ -31,7 +31,10 @@ export function Header() {
           inSheet && 'w-full justify-start'
         )}
       >
-        <Link href={href}>{label}</Link>
+        <Link href={href}>
+          {Icon && <Icon className="mr-2 h-4 w-4" />}
+          {label}
+        </Link>
       </Button>
     ))
   );
