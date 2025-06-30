@@ -10,7 +10,7 @@ import { MapDisplay } from '@/components/pharmacy/map-display';
 import { Chatbot } from '@/components/chatbot/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CalendarX } from 'lucide-react';
 import { type Pharmacy } from '@/lib/types';
 
 export default function Home() {
@@ -57,44 +57,65 @@ export default function Home() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        {!loading && !error && currentSchedule && (
-          <>
-            <div className="mb-8">
-              <WeekNavigator
-                schedules={data}
-                currentWeekIndex={currentWeekIndex}
-                onWeekChange={goToWeek}
-                onPrev={goToPrevWeek}
-                onNext={goToNextWeek}
-                isFirstWeek={isFirstWeek}
-                isLastWeek={isLastWeek}
-              />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              <div className="lg:col-span-2 space-y-6">
-                 {currentSchedule.pharmacies.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {currentSchedule.pharmacies.map((pharmacy) => (
-                          <div key={pharmacy.nom} onMouseEnter={() => setSelectedPharmacy(pharmacy)} onMouseLeave={() => setSelectedPharmacy(null)}>
-                            <PharmacyCard pharmacy={pharmacy} />
-                          </div>
-                        ))}
+        {!loading && !error && data.length > 0 && (
+          <div className="mb-8">
+            <WeekNavigator
+              schedules={data}
+              currentWeekIndex={currentWeekIndex}
+              onWeekChange={goToWeek}
+              onPrev={goToPrevWeek}
+              onNext={goToNextWeek}
+              isFirstWeek={isFirstWeek}
+              isLastWeek={isLastWeek}
+            />
+          </div>
+        )}
+
+        {!loading && !error && (
+            currentSchedule ? (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div className="lg:col-span-2 space-y-6">
+                        {currentSchedule.pharmacies.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {currentSchedule.pharmacies.map((pharmacy) => (
+                                    <div key={pharmacy.nom} onMouseEnter={() => setSelectedPharmacy(pharmacy)} onMouseLeave={() => setSelectedPharmacy(null)}>
+                                        <PharmacyCard pharmacy={pharmacy} />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <Alert>
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertTitle>Aucune pharmacie</AlertTitle>
+                                <AlertDescription>
+                                    Aucune pharmacie de garde n'est enregistrée pour cette semaine.
+                                </AlertDescription>
+                            </Alert>
+                        )}
                     </div>
-                 ) : (
-                    <Alert>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Aucune pharmacie</AlertTitle>
+                    <aside className="hidden lg:block sticky top-24">
+                        <MapDisplay pharmacies={currentSchedule.pharmacies} selectedPharmacyName={selectedPharmacy?.nom}/>
+                    </aside>
+                </div>
+            ) : (
+                data.length > 0 && !loading && (
+                    <Alert className="max-w-2xl mx-auto">
+                        <CalendarX className="h-4 w-4" />
+                        <AlertTitle>Aucun planning pour aujourd'hui</AlertTitle>
                         <AlertDescription>
-                            Aucune pharmacie de garde n'est enregistrée pour cette semaine.
+                            La date actuelle ne correspond à aucune semaine de garde programmée. Veuillez utiliser le sélecteur ci-dessus pour choisir une autre semaine.
                         </AlertDescription>
                     </Alert>
-                 )}
-              </div>
-              <aside className="hidden lg:block sticky top-24">
-                <MapDisplay pharmacies={currentSchedule.pharmacies} selectedPharmacyName={selectedPharmacy?.nom}/>
-              </aside>
-            </div>
-          </>
+                )
+            )
+        )}
+        
+        {!loading && !error && data.length === 0 && (
+             <Alert className="max-w-2xl mx-auto">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Aucune Donnée</AlertTitle>
+                <AlertDescription>Aucune donnée de pharmacie n'a été trouvée. L'administrateur doit en charger via la page 'Options'.</AlertDescription>
+            </Alert>
         )}
       </div>
       <Chatbot />

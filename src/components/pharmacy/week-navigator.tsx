@@ -33,7 +33,7 @@ export function WeekNavigator({
           <span className="sr-only">Semaine précédente</span>
         </Button>
         <h2 className="text-lg font-semibold text-center text-primary font-headline whitespace-nowrap min-w-[240px]">
-          {schedules[currentWeekIndex]?.semaine || 'Chargement...'}
+          {currentWeekIndex > -1 ? (schedules[currentWeekIndex]?.semaine || 'Chargement...') : 'Aucune semaine active'}
         </h2>
         <Button onClick={onNext} disabled={isLastWeek} variant="outline" size="icon">
           <ArrowRight className="h-4 w-4" />
@@ -43,7 +43,7 @@ export function WeekNavigator({
 
       <div className="w-full sm:w-auto sm:min-w-[280px]">
         <Select
-            value={currentWeekIndex.toString()}
+            value={currentWeekIndex > -1 ? currentWeekIndex.toString() : ''}
             onValueChange={(value) => onWeekChange(parseInt(value, 10))}
         >
             <SelectTrigger>

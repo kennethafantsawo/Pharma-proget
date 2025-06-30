@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin } from 'lucide-react';
+import { Phone, MapPin, Search } from 'lucide-react';
 import type { Pharmacy } from '@/lib/types';
 
 interface PharmacyCardProps {
@@ -37,9 +37,20 @@ export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <MapPin className="h-5 w-5 flex-shrink-0" />
-          <span className="font-body">{pharmacy.localisation}</span>
+        <div className="flex items-center justify-between gap-3 text-muted-foreground">
+          <div className="flex items-center gap-3">
+              <MapPin className="h-5 w-5 flex-shrink-0" />
+              <span className="font-body">{pharmacy.localisation}</span>
+          </div>
+          <a
+              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', ' + pharmacy.localisation)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/80"
+              title="Rechercher sur OpenStreetMap"
+          >
+              <Search className="h-5 w-5"/>
+          </a>
         </div>
         <div className="flex flex-wrap gap-2 pt-2">
           <Button asChild size="sm">

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { type WeekSchedule } from '@/lib/types';
-import { isDateInWeek } from '@/lib/date-utils';
+import { isDateInWeek, parseWeekString } from '@/lib/date-utils';
 import { supabase } from '@/lib/supabase/client';
 
 export const usePharmacies = () => {
@@ -24,7 +24,7 @@ export const usePharmacies = () => {
     }
 
     const index = schedules.findIndex(week => isDateInWeek(now, week.semaine));
-    return index !== -1 ? index : 0; // Default to first week if none match
+    return index; // Returns -1 if not found
   }, []);
   
   useEffect(() => {
@@ -33,29 +33,38 @@ export const usePharmacies = () => {
       setError(null);
 
       if (!supabase) {
-        setError("Configuration Supabase manquante. Veuillez créer un fichier .env.local avec les variables d'environnement nécessaires.");
+        setError("Configuration Supabase manquante. Veuillez vérifier votre fichier .env.local.");
         setData([]);
         setLoading(false);
         return;
       }
 
       try {
-        // Fetch data from Supabase instead of a JSON file
+        // Fetch data from Supabase
         const { data: schedules, error: fetchError } = await supabase
             .from('weeks')
             .select('semaine, pharmacies(nom, localisation, contact1, contact2)')
-            .order('semaine', { ascending: true });
+            .order('semaine', { ascending: true }); // Basic sort from DB
         
         if (fetchError) {
             throw fetchError;
         }
 
         if (schedules && Array.isArray(schedules)) {
-          // The data from Supabase should match the WeekSchedule structure
-          setData(schedules as WeekSchedule[]);
-          setCurrentWeekIndex(findCurrentWeekIndex(schedules as WeekSchedule[]));
+          // Robust sort in JS to handle date strings correctly
+          const sortedSchedules = (schedules as WeekSchedule[]).sort((a, b) => {
+            const dateA = parseWeekString(a.semaine);
+            const dateB = parseWeekString(b.semaine);
+            if (dateA && dateB) {
+              return dateA.start.getTime() - dateB.start.getTime();
+            }
+            return a.semaine.localeCompare(b.semaine);
+          });
+          
+          setData(sortedSchedules);
+          setCurrentWeekIndex(findCurrentWeekIndex(sortedSchedules));
         } else {
-          throw new Error('Invalid data format from Supabase');
+          setData([]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching data.');
@@ -104,6 +113,6 @@ export const usePharmacies = () => {
     goToNextWeek,
     goToPrevWeek,
     isFirstWeek: currentWeekIndex === 0,
-    isLastWeek: currentWeekIndex === data.length - 1,
+    isLastWeek: currentWeekIndex > -1 && currentWeekIndex === data.length - 1,
   };
 };

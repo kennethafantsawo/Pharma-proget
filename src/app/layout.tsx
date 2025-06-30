@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next';
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from '@/components/shared/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#008080" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,8 +25,15 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="font-body antialiased">
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
