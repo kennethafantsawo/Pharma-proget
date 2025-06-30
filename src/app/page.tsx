@@ -10,7 +10,8 @@ import { MapDisplay } from '@/components/pharmacy/map-display';
 import { Chatbot } from '@/components/chatbot/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, CalendarX } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { AlertCircle, CalendarX, Search, Frown } from 'lucide-react';
 import { type Pharmacy } from '@/lib/types';
 
 export default function Home() {
@@ -28,12 +29,14 @@ export default function Home() {
   } = usePharmacies();
   
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const LoadingSkeleton = () => (
     <div className="container mx-auto px-4 md:px-6 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Skeleton className="h-10 w-3/4 mx-auto" />
+          <Skeleton className="h-10 w-full" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Skeleton className="h-40 rounded-lg" />
             <Skeleton className="h-40 rounded-lg" />
@@ -45,6 +48,11 @@ export default function Home() {
       </div>
     </div>
   );
+
+  const filteredPharmacies = currentSchedule?.pharmacies.filter(p =>
+    p.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.localisation.toLowerCase().includes(searchTerm.toLowerCase())
+  ) ?? [];
 
   return (
     <PageWrapper>
@@ -58,7 +66,7 @@ export default function Home() {
           </Alert>
         )}
         {!loading && !error && data.length > 0 && (
-          <div className="mb-8">
+          <div className="flex flex-col gap-8">
             <WeekNavigator
               schedules={data}
               currentWeekIndex={currentWeekIndex}
@@ -68,16 +76,28 @@ export default function Home() {
               isFirstWeek={isFirstWeek}
               isLastWeek={isLastWeek}
             />
+            {currentSchedule && (
+              <div className="relative max-w-lg mx-auto w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Rechercher une pharmacie par nom ou zone..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            )}
           </div>
         )}
 
         {!loading && !error && (
             currentSchedule ? (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mt-8">
                     <div className="lg:col-span-2 space-y-6">
-                        {currentSchedule.pharmacies.length > 0 ? (
+                        {filteredPharmacies.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {currentSchedule.pharmacies.map((pharmacy) => (
+                                {filteredPharmacies.map((pharmacy) => (
                                     <div key={pharmacy.nom} onMouseEnter={() => setSelectedPharmacy(pharmacy)} onMouseLeave={() => setSelectedPharmacy(null)}>
                                         <PharmacyCard pharmacy={pharmacy} />
                                     </div>
@@ -85,10 +105,10 @@ export default function Home() {
                             </div>
                         ) : (
                             <Alert>
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Aucune pharmacie</AlertTitle>
+                                <Frown className="h-4 w-4" />
+                                <AlertTitle>Aucun résultat</AlertTitle>
                                 <AlertDescription>
-                                    Aucune pharmacie de garde n'est enregistrée pour cette semaine.
+                                    Aucune pharmacie ne correspond à votre recherche pour cette semaine.
                                 </AlertDescription>
                             </Alert>
                         )}
@@ -99,7 +119,7 @@ export default function Home() {
                 </div>
             ) : (
                 data.length > 0 && !loading && (
-                    <Alert className="max-w-2xl mx-auto">
+                    <Alert className="max-w-2xl mx-auto mt-8">
                         <CalendarX className="h-4 w-4" />
                         <AlertTitle>Aucun planning pour aujourd'hui</AlertTitle>
                         <AlertDescription>
@@ -111,7 +131,7 @@ export default function Home() {
         )}
         
         {!loading && !error && data.length === 0 && (
-             <Alert className="max-w-2xl mx-auto">
+             <Alert className="max-w-2xl mx-auto mt-8">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Aucune Donnée</AlertTitle>
                 <AlertDescription>Aucune donnée de pharmacie n'a été trouvée. L'administrateur doit en charger via la page 'Options'.</AlertDescription>

@@ -22,6 +22,25 @@ export type Database = {
           contact2: string
         }
       }
+      health_posts: {
+        Row: {
+          id: number;
+          created_at: string;
+          title: string;
+          content: string;
+          image_url: string | null;
+        },
+        Insert: {
+          title: string;
+          content: string;
+          image_url?: string | null;
+        },
+        Update: {
+          title?: string;
+          content?: string;
+          image_url?: string | null;
+        }
+      }
     }
   }
 }
