@@ -1,5 +1,6 @@
 
 import { Header } from './header';
+import { Footer } from './footer';
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
       <main className="flex-1">
         {children}
       </main>
+      <Footer />
     </div>
   );
 }
