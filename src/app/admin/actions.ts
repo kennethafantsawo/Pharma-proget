@@ -7,7 +7,10 @@ import { revalidatePath } from 'next/cache'
 export async function updatePharmaciesAction(password: string, newSchedules: WeekSchedule[]): Promise<{ success: boolean; message: string }> {
   // Check for Supabase admin client initialization first
   if (!supabaseAdmin) {
-    return { success: false, message: "Échec de la connexion à la base de données : la configuration côté serveur est manquante." }
+    return { 
+      success: false, 
+      message: "Échec de la connexion : La configuration côté serveur est manquante. Assurez-vous que les variables d'environnement NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sont correctement configurées." 
+    }
   }
 
   // This is a basic password check and is not secure for production.
