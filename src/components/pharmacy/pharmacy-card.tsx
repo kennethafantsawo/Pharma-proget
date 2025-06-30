@@ -43,7 +43,7 @@ export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
               <span className="font-body">{pharmacy.localisation}</span>
           </div>
           <a
-              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', ' + pharmacy.localisation)}`}
+              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', Lomé, Togo')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:text-primary/80"

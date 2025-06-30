@@ -45,7 +45,7 @@ export function MapDisplay({ pharmacies, selectedPharmacyName }: MapDisplayProps
                         </div>
                     </div>
                     <a
-                        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', ' + pharmacy.localisation)}`}
+                        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', Lomé, Togo')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
