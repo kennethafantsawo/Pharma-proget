@@ -124,6 +124,10 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
         toast({ title: "Succès", description: result.message });
         setPosts(prev => [result.newPost!, ...prev]);
         createForm.reset();
+        // Also reset file input visually
+        const fileInput = document.getElementById('image') as HTMLInputElement;
+        if(fileInput) fileInput.value = '';
+
       } else {
         toast({ title: "Erreur", description: result.message, variant: "destructive" });
       }
