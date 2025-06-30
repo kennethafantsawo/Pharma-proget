@@ -10,8 +10,7 @@ import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 
 const navLinks = [
-  { href: '/', label: 'Pharmacies de Garde' },
-  { href: '/health-library', label: 'Fiches Santé' },
+  { href: '/', label: 'Accueil' },
   { href: '/admin', label: 'Options' },
 ];
 
