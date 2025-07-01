@@ -32,7 +32,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-accent transition-colors"
           >
             <WhatsAppIcon />
           </a>
@@ -41,7 +41,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-accent transition-colors"
           >
             <Instagram className="h-6 w-6" />
           </a>
@@ -50,7 +50,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-accent transition-colors"
           >
             <Facebook className="h-6 w-6" />
           </a>

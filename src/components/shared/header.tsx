@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -27,13 +28,13 @@ export function Header() {
         className={cn(
           'font-semibold tracking-wide',
           pathname === href
-            ? 'text-primary hover:text-primary'
+            ? 'text-accent hover:text-accent'
             : 'text-foreground/70 hover:text-foreground',
-          inSheet && 'w-full justify-start'
+          inSheet && 'w-full justify-start text-base'
         )}
       >
         <Link href={href}>
-          {Icon && <Icon className="mr-2 h-4 w-4" />}
+          {Icon && <Icon className="mr-2 h-5 w-5" />}
           {label}
         </Link>
       </Button>
@@ -44,8 +45,8 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
-          <PlusSquare className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold text-primary font-headline">
+          <PlusSquare className="h-7 w-7 text-accent" />
+          <span className="text-xl font-bold text-accent font-headline">
             PharmaGuard
           </span>
         </Link>

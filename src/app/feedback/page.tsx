@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useTransition } from 'react';
@@ -52,19 +53,19 @@ export default function FeedbackPage() {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 md:px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-500">
         <div className="max-w-2xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="text-primary" />
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-muted/50">
+              <CardTitle className="flex items-center gap-3 font-headline text-2xl">
+                <Star className="text-accent" />
                 Donnez votre avis
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="!mt-2">
                 Votre opinion est importante. Partagez vos suggestions ou laissez un avis pour nous aider à améliorer l'application.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -85,7 +86,7 @@ export default function FeedbackPage() {
                               </FormControl>
                               <Label
                                 htmlFor="avis"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent/10 hover:text-accent peer-data-[state=checked]:border-accent peer-data-[state=checked]:text-accent [&:has([data-state=checked])]:border-accent cursor-pointer transition-colors"
                               >
                                 <Star className="mb-3 h-6 w-6" />
                                 Avis
@@ -97,7 +98,7 @@ export default function FeedbackPage() {
                               </FormControl>
                               <Label
                                 htmlFor="suggestion"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent/10 hover:text-accent peer-data-[state=checked]:border-accent peer-data-[state=checked]:text-accent [&:has([data-state=checked])]:border-accent cursor-pointer transition-colors"
                               >
                                 <Lightbulb className="mb-3 h-6 w-6" />
                                 Suggestion

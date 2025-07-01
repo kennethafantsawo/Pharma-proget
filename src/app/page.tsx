@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -53,7 +54,7 @@ export default function Home() {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 md:px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-500">
         {pharmaciesLoading && <PharmacyLoadingSkeleton />}
         {pharmaciesError && (
           <Alert variant="destructive" className="max-w-2xl mx-auto">
@@ -75,13 +76,13 @@ export default function Home() {
             />
             {currentSchedule && (
               <div className="relative max-w-lg mx-auto w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Rechercher une pharmacie par nom ou zone..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-11"
                 />
               </div>
             )}

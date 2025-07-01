@@ -28,12 +28,14 @@ export default async function HealthLibraryPage() {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 md:px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-500">
         <div className="max-w-2xl mx-auto">
           <header className="mb-8 text-center">
-            <BookOpen className="mx-auto h-12 w-12 text-primary mb-2" />
-            <h1 className="text-3xl font-bold font-headline text-primary">Fiches Santé</h1>
-            <p className="text-muted-foreground mt-2">
+            <div className="inline-block p-4 bg-accent/10 rounded-xl">
+              <BookOpen className="h-10 w-10 text-accent" />
+            </div>
+            <h1 className="text-4xl font-bold font-headline text-foreground mt-4">Fiches Santé</h1>
+            <p className="text-muted-foreground mt-2 text-lg">
               Conseils et actualités santé de nos experts.
             </p>
           </header>
@@ -46,10 +48,12 @@ export default async function HealthLibraryPage() {
             </Alert>
           )}
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             {posts && posts.length > 0 ? (
-              posts.map(post => (
-                <HealthPostCard key={post.id} post={post} />
+              posts.map((post, index) => (
+                <div key={post.id} style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }} className="animate-in fade-in slide-in-from-bottom-5 duration-700">
+                  <HealthPostCard post={post} />
+                </div>
               ))
             ) : !error && (
               <Alert>

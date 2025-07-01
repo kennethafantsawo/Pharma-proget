@@ -30,23 +30,23 @@ export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   const whatsAppNumber = pharmacy.contact2.startsWith('+') ? pharmacy.contact2.substring(1) : pharmacy.contact2;
 
   return (
-    <Card className="w-full transition-shadow duration-300 hover:shadow-lg">
+    <Card className="w-full h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
-        <CardTitle className="font-headline text-xl text-primary">
+        <CardTitle className="font-headline text-xl text-accent">
           {pharmacy.nom}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between gap-3 text-muted-foreground">
-          <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 flex-shrink-0" />
+        <div className="flex items-start justify-between gap-3 text-muted-foreground">
+          <div className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
               <span className="font-body">{pharmacy.localisation}</span>
           </div>
           <a
               href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', Lomé, Togo')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80"
+              className="text-accent/80 hover:text-accent flex-shrink-0"
               title="Rechercher sur OpenStreetMap"
           >
               <MapPin className="h-5 w-5"/>

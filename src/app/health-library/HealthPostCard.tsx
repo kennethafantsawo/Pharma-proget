@@ -1,8 +1,9 @@
+
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
 import Image from 'next/image'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ThumbsUp, MessageCircle, Share2, LoaderCircle } from 'lucide-react'
 import type { HealthPost } from '@/lib/types'
@@ -91,19 +92,12 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
   }
 
   return (
-    <Card id={`post-${post.id}`} className="w-full scroll-mt-20">
+    <Card id={`post-${post.id}`} className="w-full scroll-mt-20 overflow-hidden transition-all duration-300 hover:shadow-xl">
       <Collapsible onOpenChange={setIsCommentsOpen}>
-        <CardHeader>
-          <CardTitle>{post.title}</CardTitle>
-          <CardDescription>
-            Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {post.image_url && (
+        {post.image_url && (
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden cursor-pointer">
+                <div className="relative aspect-video w-full cursor-pointer transition-transform duration-300 hover:scale-105">
                   <Image
                     src={post.image_url}
                     alt={post.title}
@@ -124,26 +118,38 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
                   </div>
               </DialogContent>
             </Dialog>
-          )}
-          <p className="text-base text-foreground/90 whitespace-pre-wrap">{post.content}</p>
+        )}
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl font-bold">{post.title}</CardTitle>
+          <p className="text-sm text-muted-foreground pt-1">
+            Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </CardHeader>
+        
+        <CardContent>
+          <p className="text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">{post.content}</p>
         </CardContent>
-        <CardFooter className="flex justify-start gap-1 sm:gap-4">
-          <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLiked || isLikePending} className="text-muted-foreground">
-            {isLikePending ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'text-primary fill-primary' : ''}`} />}
-            {likes} J'aime
+
+        <CardFooter className="flex justify-start gap-1 sm:gap-2 bg-muted/50 p-3 mt-4">
+          <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLikePending} className="text-muted-foreground rounded-full">
+            {isLikePending 
+              ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> 
+              : <ThumbsUp className={cn('mr-2 h-4 w-4 transition-colors', isLiked ? 'text-accent fill-accent/20' : '')} />
+            }
+            {likes}
           </Button>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
+            <Button variant="ghost" size="sm" className="text-muted-foreground rounded-full">
               <MessageCircle className="mr-2 h-4 w-4" /> Commenter
             </Button>
           </CollapsibleTrigger>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleShare}>
+          <Button variant="ghost" size="sm" className="text-muted-foreground rounded-full" onClick={handleShare}>
               <Share2 className="mr-2 h-4 w-4" /> Partager
           </Button>
         </CardFooter>
         
         <CollapsibleContent>
-           <CardContent>
+           <CardContent className="pt-4">
              {isCommentsOpen && <CommentSection postId={post.id} />}
            </CardContent>
         </CollapsibleContent>

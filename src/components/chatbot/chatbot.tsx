@@ -44,10 +44,12 @@ export function Chatbot() {
   });
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+    if (isOpen && scrollAreaRef.current) {
+      setTimeout(() => {
+        scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+      }, 100);
     }
-  }, [messages]);
+  }, [messages, isOpen]);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -77,7 +79,7 @@ export function Chatbot() {
       <Button
         className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
         onClick={() => setIsOpen(true)}
-        aria-label="Open chatbot"
+        aria-label="Ouvrir le chatbot"
       >
         <MessageSquare className="h-8 w-8" />
       </Button>
@@ -85,7 +87,7 @@ export function Chatbot() {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex flex-col p-0 w-full sm:max-w-md">
           <SheetHeader className="p-4 border-b">
-            <SheetTitle className="flex items-center gap-2">
+            <SheetTitle className="flex items-center gap-2 font-headline text-accent">
               <Bot />
               Assistant Pharmacien
             </SheetTitle>
@@ -94,15 +96,15 @@ export function Chatbot() {
           <ScrollArea className="flex-1" ref={scrollAreaRef}>
             <div className="p-4 space-y-4">
               {messages.map((message) => (
-                <div key={message.id} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                <div key={message.id} className={`flex items-end gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                   {message.role === 'assistant' && (
-                    <Avatar className="h-8 w-8 border">
-                      <AvatarFallback className="bg-primary text-primary-foreground"><Bot size={20}/></AvatarFallback>
+                    <Avatar className="h-8 w-8 border bg-accent/20">
+                      <AvatarFallback className="bg-transparent text-accent"><Bot size={20}/></AvatarFallback>
                     </Avatar>
                   )}
-                  <Card className={`max-w-[80%] ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                    <CardContent className="p-3 text-sm">{message.text}</CardContent>
-                  </Card>
+                  <div className={`max-w-[80%] rounded-xl px-4 py-2 ${message.role === 'user' ? 'bg-accent text-accent-foreground' : 'bg-muted'}`}>
+                    <p className="text-sm">{message.text}</p>
+                  </div>
                    {message.role === 'user' && (
                     <Avatar className="h-8 w-8 border">
                       <AvatarFallback><User size={20}/></AvatarFallback>
@@ -112,14 +114,12 @@ export function Chatbot() {
               ))}
               {isLoading && (
                 <div className="flex items-start gap-3">
-                    <Avatar className="h-8 w-8 border">
-                      <AvatarFallback className="bg-primary text-primary-foreground"><Bot size={20}/></AvatarFallback>
+                    <Avatar className="h-8 w-8 border bg-accent/20">
+                      <AvatarFallback className="bg-transparent text-accent"><Bot size={20}/></AvatarFallback>
                     </Avatar>
-                    <Card className="bg-muted">
-                        <CardContent className="p-3">
-                            <LoaderCircle className="animate-spin" />
-                        </CardContent>
-                    </Card>
+                    <div className="bg-muted rounded-xl px-4 py-3">
+                        <LoaderCircle className="animate-spin h-5 w-5" />
+                    </div>
                 </div>
               )}
             </div>
@@ -134,7 +134,7 @@ export function Chatbot() {
                 disabled={isLoading}
               />
               <Button type="submit" size="icon" disabled={isLoading}>
-                <Send className="h-4 w-4" />
+                {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </form>
             {errors.query && <p className="text-destructive text-xs mt-1">{errors.query.message}</p>}

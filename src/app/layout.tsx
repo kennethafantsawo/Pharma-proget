@@ -3,6 +3,10 @@ import type { Metadata } from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import './globals.css';
+import { Inter, Sora } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const sora = Sora({ subsets: ['latin'], variable: '--font-sora' });
 
 export const metadata: Metadata = {
   title: 'PharmaGuard',
@@ -18,13 +22,10 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#008080" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#2563eb" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className="font-body antialiased">
+      <body className={`${inter.variable} ${sora.variable} font-body antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
