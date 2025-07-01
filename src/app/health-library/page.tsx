@@ -30,12 +30,9 @@ export default async function HealthLibraryPage() {
     <PageWrapper>
       <div className="container mx-auto px-4 md:px-6 py-8 animate-in fade-in duration-500">
         <div className="max-w-2xl mx-auto">
-          <header className="mb-8 text-center">
-            <div className="inline-block p-4 bg-accent/10 rounded-xl">
-              <BookOpen className="h-10 w-10 text-accent" />
-            </div>
-            <h1 className="text-4xl font-bold font-headline text-foreground mt-4">Fiches Santé</h1>
-            <p className="text-muted-foreground mt-2 text-lg">
+          <header className="mb-8">
+            <h1 className="text-2xl font-bold font-headline text-foreground">Accueil Fiches Santé</h1>
+            <p className="text-muted-foreground mt-1">
               Conseils et actualités santé de nos experts.
             </p>
           </header>
@@ -48,21 +45,21 @@ export default async function HealthLibraryPage() {
             </Alert>
           )}
 
-          <div className="space-y-8">
+          <div className="border border-b-0 rounded-t-xl overflow-hidden">
             {posts && posts.length > 0 ? (
-              posts.map((post, index) => (
-                <div key={post.id} style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }} className="animate-in fade-in slide-in-from-bottom-5 duration-700">
-                  <HealthPostCard post={post} />
-                </div>
+              posts.map((post) => (
+                <HealthPostCard key={post.id} post={post} />
               ))
             ) : !error && (
-              <Alert>
-                <AlertCircle className="h-4 w-4"/>
-                <AlertTitle>Aucune Fiche Santé</AlertTitle>
-                <AlertDescription>
-                  Aucune fiche n'a été publiée pour le moment. Revenez bientôt !
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 border-b">
+                <Alert>
+                  <AlertCircle className="h-4 w-4"/>
+                  <AlertTitle>Aucune Fiche Santé</AlertTitle>
+                  <AlertDescription>
+                    Aucune fiche n'a été publiée pour le moment. Revenez bientôt !
+                  </AlertDescription>
+                </Alert>
+              </div>
             )}
           </div>
         </div>

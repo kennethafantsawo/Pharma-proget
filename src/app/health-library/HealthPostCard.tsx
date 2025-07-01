@@ -1,10 +1,10 @@
+
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
 import Image from 'next/image'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ThumbsUp, MessageCircle, Share2, LoaderCircle } from 'lucide-react'
+import { Heart, MessageCircle, Share2, LoaderCircle, BookOpen } from 'lucide-react'
 import type { HealthPost } from '@/lib/types'
 import { useToast } from '@/hooks/use-toast'
 import { incrementLikeAction } from './actions'
@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CommentSection } from './CommentSection'
 import { cn } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 interface HealthPostCardProps {
   post: HealthPost
@@ -23,6 +25,7 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
   const [likes, setLikes] = useState(post.likes)
   const [isLiked, setIsLiked] = useState(false)
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
+  const [commentCount, setCommentCount] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -37,21 +40,26 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
   }, [post.id])
 
   const handleLike = () => {
-    if (isLiked || isLikePending) return
+    if (isLikePending) return;
 
     startLikeTransition(async () => {
+      const wasLiked = isLiked;
       // Optimistic UI updates
-      setIsLiked(true)
-      setLikes(prev => prev + 1)
+      setIsLiked(!wasLiked)
+      setLikes(prev => wasLiked ? prev - 1 : prev + 1);
       
       try {
           const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]') as number[]
-          localStorage.setItem('likedPosts', JSON.stringify([...likedPosts, post.id]))
+          if (wasLiked) {
+            localStorage.setItem('likedPosts', JSON.stringify(likedPosts.filter(id => id !== post.id)))
+          } else {
+            localStorage.setItem('likedPosts', JSON.stringify([...likedPosts, post.id]))
+          }
       } catch(error) {
           console.error('Failed to update liked posts in localStorage', error)
       }
 
-      const result = await incrementLikeAction(post.id)
+      const result = await incrementLikeAction(post.id, wasLiked)
 
       if (!result.success) {
         toast({
@@ -60,11 +68,15 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
           variant: 'destructive',
         })
         // Rollback UI updates on failure
-        setIsLiked(false)
-        setLikes(prev => prev - 1)
+        setIsLiked(wasLiked)
+        setLikes(prev => wasLiked ? prev + 1 : prev - 1);
         try {
-            const updatedLikedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]') as number[]
-            localStorage.setItem('likedPosts', JSON.stringify(updatedLikedPosts.filter(id => id !== post.id)))
+            const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]') as number[]
+            if(wasLiked) {
+                localStorage.setItem('likedPosts', JSON.stringify([...likedPosts, post.id]))
+            } else {
+                localStorage.setItem('likedPosts', JSON.stringify(likedPosts.filter(id => id !== post.id)))
+            }
         } catch(error) {
             console.error('Failed to rollback liked posts in localStorage', error)
         }
@@ -92,68 +104,67 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
   }
 
   return (
-    <Card id={`post-${post.id}`} className="w-full scroll-mt-20 overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div id={`post-${post.id}`} className="w-full scroll-mt-20 p-4 border-b transition-colors hover:bg-muted/50">
       <Collapsible onOpenChange={setIsCommentsOpen}>
-        {post.image_url && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative aspect-[2/1] w-full cursor-pointer transition-transform duration-300 hover:scale-105">
-                  <Image
-                    src={post.image_url}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="p-0 border-0 max-w-4xl bg-transparent">
-                  <div className="relative aspect-video w-full">
-                     <Image
-                        src={post.image_url}
-                        alt={post.title}
-                        fill
-                        className="object-contain"
+        <div className="flex gap-3">
+          <div className="flex-shrink-0 pt-1">
+            <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
+              <BookOpen className="h-5 w-5 text-accent-foreground" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-bold text-foreground">PharmaGuard Santé</span>
+              <span className="text-muted-foreground text-sm">· {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: fr })}</span>
+            </div>
+            
+            <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+            <p className="text-base text-foreground/90 whitespace-pre-wrap leading-relaxed mb-3">{post.content}</p>
+
+            {post.image_url && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 border cursor-pointer">
+                    <Image
+                      src={post.image_url}
+                      alt={post.title}
+                      fill
+                      className="object-cover transition-transform duration-300 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
-              </DialogContent>
-            </Dialog>
-        )}
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl font-bold">{post.title}</CardTitle>
-          <p className="text-sm text-muted-foreground pt-1">
-            Publié le {new Date(post.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <p className="text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">{post.content}</p>
-        </CardContent>
+                </DialogTrigger>
+                <DialogContent className="p-0 border-0 max-w-4xl bg-transparent">
+                  <div className="relative aspect-video w-full">
+                    <Image src={post.image_url} alt={post.title} fill className="object-contain" />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
 
-        <CardFooter className="flex justify-start gap-1 sm:gap-2 bg-muted/50 p-3 mt-4">
-          <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLikePending} className="text-muted-foreground rounded-full">
-            {isLikePending 
-              ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> 
-              : <ThumbsUp className={cn('mr-2 h-4 w-4 transition-colors', isLiked ? 'text-accent fill-accent/20' : '')} />
-            }
-            {likes}
-          </Button>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-muted-foreground rounded-full">
-              <MessageCircle className="mr-2 h-4 w-4" /> Commenter
-            </Button>
-          </CollapsibleTrigger>
-          <Button variant="ghost" size="sm" className="text-muted-foreground rounded-full" onClick={handleShare}>
-              <Share2 className="mr-2 h-4 w-4" /> Partager
-          </Button>
-        </CardFooter>
-        
+            <div className="flex items-center justify-start gap-12 text-muted-foreground -ml-2">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="rounded-full hover:bg-blue-500/10 hover:text-blue-500 flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="text-sm font-medium">{commentCount !== null && commentCount > 0 ? commentCount : ''}</span>
+                </Button>
+              </CollapsibleTrigger>
+              <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLikePending} className={cn("rounded-full hover:bg-pink-500/10 hover:text-pink-500 flex items-center gap-2", isLiked && "text-pink-500")}>
+                {isLikePending ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Heart className={cn('h-5 w-5', isLiked ? 'fill-current' : '')} />}
+                <span className="text-sm font-medium">{likes > 0 ? likes : ''}</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="rounded-full hover:bg-green-500/10 hover:text-green-500" onClick={handleShare}>
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
         <CollapsibleContent>
-           <CardContent className="pt-4">
-             {isCommentsOpen && <CommentSection postId={post.id} />}
-           </CardContent>
+          <div className="pt-4 pl-12">
+            {isCommentsOpen && <CommentSection postId={post.id} onCountChange={setCommentCount} />}
+          </div>
         </CollapsibleContent>
       </Collapsible>
-    </Card>
+    </div>
   )
 }
