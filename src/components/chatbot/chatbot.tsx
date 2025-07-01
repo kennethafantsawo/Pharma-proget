@@ -81,7 +81,7 @@ export function Chatbot() {
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
       >
-        <MessageSquare className="h-8 w-8" />
+        <Sparkles className="h-8 w-8" />
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
