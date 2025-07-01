@@ -8,18 +8,26 @@ const remotePatterns: NextConfig['images']['remotePatterns'] = [
     port: '',
     pathname: '/**',
   },
+  {
+    protocol: 'https',
+    hostname: 'pooariitfzfacjafwkkp.supabase.co',
+    port: '',
+    pathname: '/storage/v1/object/public/health-posts-images/**',
+  },
 ];
 
 // Add Supabase storage hostname if the URL is set
 if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
   try {
     const supabaseHostname = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname;
-    remotePatterns.push({
-      protocol: 'https',
-      hostname: supabaseHostname,
-      port: '',
-      pathname: '/storage/v1/object/public/health-posts-images/**',
-    });
+    if (supabaseHostname !== 'pooariitfzfacjafwkkp.supabase.co') {
+        remotePatterns.push({
+          protocol: 'https',
+          hostname: supabaseHostname,
+          port: '',
+          pathname: '/storage/v1/object/public/health-posts-images/**',
+        });
+    }
   } catch (error) {
     console.error('Invalid NEXT_PUBLIC_SUPABASE_URL in next.config.js:', error);
   }
