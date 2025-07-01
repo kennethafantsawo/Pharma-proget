@@ -18,8 +18,14 @@ async function getHealthPosts(): Promise<{ posts: HealthPost[] | null; error: st
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error("Error fetching health posts:", error);
-    return { posts: null, error: "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle bien avec toutes ses colonnes (dont 'likes' et 'publish_at') ?" };
+    console.error("Error fetching health posts:", error.message);
+    let userMessage = "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle bien avec toutes ses colonnes ?";
+    if (error.message.includes('column "likes" does not exist')) {
+        userMessage = "La colonne 'likes' est manquante dans la base de données. Veuillez exécuter le script SQL pour l'ajouter et réactualiser la page.";
+    } else if (error.message.includes('column "publish_at" does not exist')) {
+        userMessage = "La colonne 'publish_at' est manquante dans la base de données. Veuillez exécuter le script SQL pour l'ajouter et réactualiser la page.";
+    }
+    return { posts: null, error: userMessage };
   }
   return { posts: data, error: null };
 }
