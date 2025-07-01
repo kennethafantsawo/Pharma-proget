@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
@@ -98,7 +97,7 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
         {post.image_url && (
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-video w-full cursor-pointer transition-transform duration-300 hover:scale-105">
+                <div className="relative aspect-[2/1] w-full cursor-pointer transition-transform duration-300 hover:scale-105">
                   <Image
                     src={post.image_url}
                     alt={post.title}
