@@ -70,18 +70,7 @@ export type Database = {
       }
     }
     Functions: {
-      increment_likes: {
-        Args: {
-          post_id_to_inc: number;
-        };
-        Returns: undefined;
-      };
-      decrement_likes: {
-        Args: {
-          post_id_to_dec: number;
-        };
-        Returns: undefined;
-      };
+      [_: string]: never
     }
   }
 }
