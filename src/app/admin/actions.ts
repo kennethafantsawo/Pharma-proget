@@ -235,24 +235,31 @@ export async function deleteHealthPostAction(
   }
 }
 
-export async function incrementLikeAction(postId: number): Promise<{ success: boolean; error?: string }> {
-    if (!supabaseAdmin) return { success: false, error: "Configuration serveur manquante." };
-    const { error } = await supabaseAdmin.rpc('increment_likes', { post_id_to_inc: postId });
-    if (error) {
-        console.error('Like error:', error.message)
-        return { success: false, error: "Erreur lors de la mise à jour du like" };
-    }
-    revalidatePath('/health-library');
-    return { success: true };
-}
+export async function incrementLikeAction(postId: number, unlike: boolean = false): Promise<{ success: boolean; error?: string }> {
+  if (!supabaseAdmin) {
+    return { success: false, error: "Configuration serveur manquante." };
+  }
 
-export async function decrementLikeAction(postId: number): Promise<{ success: boolean; error?: string }> {
-    if (!supabaseAdmin) return { success: false, error: "Configuration serveur manquante." };
-    const { error } = await supabaseAdmin.rpc('decrement_likes', { post_id_to_dec: postId });
+  try {
+    const rpcName = unlike ? 'decrement_likes' : 'increment_likes';
+    const params = unlike ? { post_id_to_dec: postId } : { post_id_to_inc: postId };
+    
+    const { error } = await supabaseAdmin.rpc(rpcName, params);
+
     if (error) {
-         console.error('Unlike error:', error.message)
-        return { success: false, error: "Erreur lors de la mise à jour du like" };
+      console.error(`Error calling RPC ${rpcName}:`, error);
+      if (error.message.includes('function') && error.message.includes('does not exist')) {
+        return { success: false, error: "Une fonction nécessaire manque dans la base de données. Veuillez exécuter le script SQL fourni." };
+      }
+      return { success: false, error: "Erreur lors de la mise à jour du like." };
     }
+
     revalidatePath('/health-library');
     return { success: true };
+
+  } catch (error) {
+    console.error('Unexpected error in incrementLikeAction:', error);
+    const message = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    return { success: false, error: message };
+  }
 }
