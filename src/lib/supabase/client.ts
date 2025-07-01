@@ -30,18 +30,21 @@ export type Database = {
           content: string;
           image_url: string | null;
           likes: number;
+          publish_at: string | null;
         },
         Insert: {
           title: string;
           content: string;
           image_url?: string | null;
           likes?: number;
+          publish_at?: string | null;
         },
         Update: {
           title?: string;
           content?: string;
           image_url?: string | null;
           likes?: number;
+          publish_at?: string | null;
         }
       },
       health_post_comments: {

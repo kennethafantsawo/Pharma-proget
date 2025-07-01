@@ -93,6 +93,7 @@ export async function createHealthPostAction(
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const imageFile = formData.get('image') as File | null;
+    const publishAt = formData.get('publish_at') as string | null;
     let imageUrl: string | null = null;
 
     if (!title || !content) {
@@ -112,7 +113,7 @@ export async function createHealthPostAction(
 
     const { data, error } = await supabaseAdmin
       .from('health_posts')
-      .insert({ title, content, image_url: imageUrl })
+      .insert({ title, content, image_url: imageUrl, publish_at: publishAt })
       .select()
       .single();
 
@@ -138,7 +139,8 @@ export async function updateHealthPostAction(
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const imageFile = formData.get('image') as File | null;
-    
+    const publishAt = formData.get('publish_at') as string; // 'null' if not sent, '' if cleared, or ISO string
+
     if (!title || !content) {
       return { success: false, message: "Le titre et le contenu sont requis." };
     }
@@ -162,9 +164,21 @@ export async function updateHealthPostAction(
       imageUrl = supabaseAdmin.storage.from(BUCKET_NAME).getPublicUrl(newFileName).data.publicUrl;
     }
 
+    const updatePayload: {
+      title: string;
+      content: string;
+      image_url: string | null;
+      publish_at?: string | null;
+    } = { title, content, image_url: imageUrl };
+
+    // Only update publish_at if it was part of the form data
+    if (publishAt !== null) {
+        updatePayload.publish_at = publishAt ? publishAt : null;
+    }
+
     const { data, error } = await supabaseAdmin
       .from('health_posts')
-      .update({ title, content, image_url: imageUrl })
+      .update(updatePayload)
       .eq('id', postId)
       .select()
       .single();
@@ -219,4 +233,26 @@ export async function deleteHealthPostAction(
     const message = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
     return { success: false, message: `Échec de la suppression : ${message}` };
   }
+}
+
+export async function incrementLikeAction(postId: number): Promise<{ success: boolean; error?: string }> {
+    if (!supabaseAdmin) return { success: false, error: "Configuration serveur manquante." };
+    const { error } = await supabaseAdmin.rpc('increment_likes', { post_id_to_inc: postId });
+    if (error) {
+        console.error('Like error:', error.message)
+        return { success: false, error: "Erreur lors de la mise à jour du like" };
+    }
+    revalidatePath('/health-library');
+    return { success: true };
+}
+
+export async function decrementLikeAction(postId: number): Promise<{ success: boolean; error?: string }> {
+    if (!supabaseAdmin) return { success: false, error: "Configuration serveur manquante." };
+    const { error } = await supabaseAdmin.rpc('decrement_likes', { post_id_to_dec: postId });
+    if (error) {
+         console.error('Unlike error:', error.message)
+        return { success: false, error: "Erreur lors de la mise à jour du like" };
+    }
+    revalidatePath('/health-library');
+    return { success: true };
 }

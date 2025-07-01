@@ -13,11 +13,13 @@ async function getHealthPosts(): Promise<{ posts: HealthPost[] | null; error: st
   const { data, error } = await supabase
     .from('health_posts')
     .select('*')
+    // Ne récupérer que les fiches publiées (date de publication passée ou nulle)
+    .or('publish_at.is.null,publish_at.lte.now()')
     .order('created_at', { ascending: false });
 
   if (error) {
     console.error("Error fetching health posts:", error);
-    return { posts: null, error: "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle bien avec toutes ses colonnes (dont 'likes') ?" };
+    return { posts: null, error: "Impossible de charger les fiches santé. La table 'health_posts' existe-t-elle bien avec toutes ses colonnes (dont 'likes' et 'publish_at') ?" };
   }
   return { posts: data, error: null };
 }

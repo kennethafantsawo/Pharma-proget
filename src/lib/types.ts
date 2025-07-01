@@ -18,6 +18,7 @@ export interface HealthPost {
   image_url: string | null;
   created_at: string;
   likes: number;
+  publish_at: string | null;
 }
 
 export interface HealthPostComment {

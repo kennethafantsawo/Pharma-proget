@@ -5,6 +5,8 @@ import { useState, useTransition, type ChangeEvent, useEffect, useRef } from 're
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 import { PageWrapper } from '@/components/shared/page-wrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,13 +14,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast"
-import { Lock, Settings, LogOut, CheckCircle, AlertTriangle, LoaderCircle, Trash2, Newspaper, Upload, PlusCircle, Pencil, X } from 'lucide-react';
+import { Lock, Settings, LogOut, CheckCircle, AlertTriangle, LoaderCircle, Trash2, Newspaper, Upload, PlusCircle, Pencil, X, CalendarIcon, Clock } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+
 
 import type { WeekSchedule, HealthPost } from '@/lib/types';
 import { createHealthPostAction, deleteHealthPostAction, updateHealthPostAction, updatePharmaciesAction } from './actions';
@@ -40,6 +46,7 @@ const HealthPostSchema = z.object({
     .optional()
     .refine((files) => !files || files.length === 0 || files[0].size <= MAX_FILE_SIZE, `La taille maximale de l'image est de 5Mo.`)
     .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files[0].type), "Seuls les formats .jpg, .jpeg, .png et .webp sont acceptés."),
+  publish_at: z.date().optional(),
 });
 type HealthPostValues = z.infer<typeof HealthPostSchema>;
 
@@ -58,6 +65,7 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
     const fetchPosts = async () => {
       if (!supabase) return;
       setIsLoadingPosts(true);
+      // Fetch all posts, even scheduled ones, for the admin view
       const { data, error } = await supabase.from('health_posts').select('*').order('created_at', { ascending: false });
       if (data) setPosts(data);
       if (error) toast({ title: "Erreur", description: "Impossible de charger les fiches santé.", variant: "destructive" });
@@ -71,6 +79,7 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
         editForm.reset({
             title: editingPost.title,
             content: editingPost.content,
+            publish_at: editingPost.publish_at ? new Date(editingPost.publish_at) : undefined,
         });
     }
   }, [editingPost, editForm]);
@@ -117,6 +126,9 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
     if (data.image && data.image.length > 0) {
       formData.append('image', data.image[0]);
     }
+    if (data.publish_at) {
+        formData.append('publish_at', data.publish_at.toISOString());
+    }
 
     startTransition(async () => {
       const result = await createHealthPostAction(password, formData);
@@ -144,6 +156,13 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
       formData.append('image', data.image[0]);
     }
 
+    if (data.publish_at) {
+      formData.append('publish_at', data.publish_at.toISOString());
+    } else {
+      // Send empty string to clear the date in the backend
+      formData.append('publish_at', '');
+    }
+
     startTransition(async () => {
       const result = await updateHealthPostAction(password, editingPost.id, formData);
       if (result.success && result.updatedPost) {
@@ -167,6 +186,35 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
       }
     });
   };
+
+  const DatePickerField = ({ form, fieldName }: { form: any, fieldName: "publish_at" }) => (
+    <div>
+        <Label htmlFor={fieldName}>Date de publication (Optionnel)</Label>
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    variant={"outline"}
+                    className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.watch(fieldName) && "text-muted-foreground"
+                    )}
+                >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.watch(fieldName) ? format(form.watch(fieldName), "PPP 'à' HH:mm", { locale: fr }) : <span>Choisir une date</span>}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+                <Calendar
+                    mode="single"
+                    selected={form.watch(fieldName)}
+                    onSelect={(date) => form.setValue(fieldName, date, { shouldValidate: true })}
+                    initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+        {form.formState.errors[fieldName] && <p className="text-destructive text-sm mt-1">{form.formState.errors[fieldName].message}</p>}
+    </div>
+  );
 
   return (
     <Card className="w-full">
@@ -212,6 +260,7 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
                     <Input id="image" type="file" accept="image/*" {...createForm.register('image')} disabled={isPending}/>
                     {createForm.formState.errors.image && <p className="text-destructive text-sm mt-1">{createForm.formState.errors.image.message}</p>}
                   </div>
+                   <DatePickerField form={createForm} fieldName="publish_at" />
                   <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? <LoaderCircle className="animate-spin" /> : 'Publier la fiche'}
                   </Button>
@@ -223,40 +272,52 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
                   {isLoadingPosts ? <p>Chargement...</p> : 
                     posts.length > 0 ? (
                       <div className="space-y-4">
-                        {posts.map(post => (
-                          <Card key={post.id} className="flex items-center justify-between p-3">
-                            <div className="flex items-center gap-3">
-                                {post.image_url ? 
-                                  <Image src={post.image_url} alt={post.title} width={40} height={40} className="rounded-md object-cover" /> 
-                                  : <div className="h-10 w-10 bg-muted rounded-md flex items-center justify-center"><Newspaper className="h-5 w-5 text-muted-foreground"/></div>
-                                }
-                                <div>
-                                   <p className="font-semibold">{post.title}</p>
-                                   <p className="text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="icon" onClick={() => setEditingPost(post)} disabled={isPending}>
-                                    <Pencil className="h-4 w-4" />
-                                </Button>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" size="icon" disabled={isPending}><Trash2 className="h-4 w-4" /></Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                                            <AlertDialogDescription>Cette action est irréversible. La fiche santé "{post.title}" sera définitivement supprimée.</AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDeletePost(post.id)}>Supprimer</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
-                          </Card>
-                        ))}
+                        {posts.map(post => {
+                          const isScheduled = post.publish_at && new Date(post.publish_at) > new Date();
+                          return (
+                            <Card key={post.id} className="flex items-center justify-between p-3">
+                              <div className="flex items-center gap-3">
+                                  {post.image_url ? 
+                                    <Image src={post.image_url} alt={post.title} width={40} height={40} className="rounded-md object-cover" /> 
+                                    : <div className="h-10 w-10 bg-muted rounded-md flex items-center justify-center"><Newspaper className="h-5 w-5 text-muted-foreground"/></div>
+                                  }
+                                  <div>
+                                     <p className="font-semibold">{post.title}</p>
+                                     <div className="text-xs text-muted-foreground">
+                                        {isScheduled ? (
+                                            <span className="flex items-center gap-1 text-amber-600">
+                                                <Clock className="h-3 w-3" />
+                                                Programmé: {format(new Date(post.publish_at!), 'dd/MM/yy', { locale: fr })}
+                                            </span>
+                                        ) : (
+                                            <span>Publié: {new Date(post.created_at).toLocaleDateString()}</span>
+                                        )}
+                                     </div>
+                                  </div>
+                              </div>
+                              <div className="flex gap-2">
+                                  <Button variant="outline" size="icon" onClick={() => setEditingPost(post)} disabled={isPending}>
+                                      <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                          <Button variant="destructive" size="icon" disabled={isPending}><Trash2 className="h-4 w-4" /></Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                              <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                              <AlertDialogDescription>Cette action est irréversible. La fiche santé "{post.title}" sera définitivement supprimée.</AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                              <AlertDialogAction onClick={() => handleDeletePost(post.id)}>Supprimer</AlertDialogAction>
+                                          </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                  </AlertDialog>
+                              </div>
+                            </Card>
+                          )
+                        })}
                       </div>
                     ) : (
                       <p className="text-muted-foreground text-sm">Aucune fiche santé trouvée.</p>
@@ -293,6 +354,7 @@ const AdminPanel = ({ onLogout, password }: { onLogout: () => void, password: st
                     <Input id="edit-image" type="file" accept="image/*" {...editForm.register('image')} disabled={isPending}/>
                     {editForm.formState.errors.image && <p className="text-destructive text-sm mt-1">{editForm.formState.errors.image.message}</p>}
                 </div>
+                <DatePickerField form={editForm} fieldName="publish_at" />
                 <DialogFooter>
                     <DialogClose asChild><Button type="button" variant="outline">Annuler</Button></DialogClose>
                     <Button type="submit" disabled={isPending}>
