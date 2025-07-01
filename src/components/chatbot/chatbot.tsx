@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Bot, MessageSquare, Send, X, LoaderCircle, User, Sparkles } from 'lucide-react';
+import { MessageSquare, Send, X, LoaderCircle, User, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,7 +88,7 @@ export function Chatbot() {
         <SheetContent className="flex flex-col p-0 w-full sm:max-w-md">
           <SheetHeader className="p-4 border-b">
             <SheetTitle className="flex items-center gap-2 font-headline text-accent">
-              <Bot />
+              <Sparkles />
               Assistant Pharmacien
             </SheetTitle>
           </SheetHeader>
@@ -99,7 +99,7 @@ export function Chatbot() {
                 <div key={message.id} className={`flex items-end gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                   {message.role === 'assistant' && (
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><Bot size={20}/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><Sparkles size={20}/></AvatarFallback>
                     </Avatar>
                   )}
                   <div className={`max-w-[80%] rounded-xl px-4 py-2 ${message.role === 'user' ? 'bg-accent text-accent-foreground' : 'bg-muted'}`}>
@@ -115,7 +115,7 @@ export function Chatbot() {
               {isLoading && (
                 <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><Bot size={20}/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><Sparkles size={20}/></AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-xl px-4 py-3">
                         <LoaderCircle className="animate-spin h-5 w-5" />
