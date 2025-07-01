@@ -27,31 +27,6 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>;
 
-const GeminiIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        {...props}
-    >
-        <path
-            d="M12.75 4.75C12.75 6.26878 14.1543 7.5 15.875 7.5C17.5957 7.5 19 6.26878 19 4.75C19 3.23122 17.5957 2 15.875 2C14.1543 2 12.75 3.23122 12.75 4.75Z"
-            fill="currentColor"
-        />
-        <path
-            d="M5 9.5C5 12.5376 7.61167 15 10.875 15C14.1383 15 16.75 12.5376 16.75 9.5C16.75 6.46243 14.1383 4 10.875 4C7.61167 4 5 6.46243 5 9.5Z"
-            fill="currentColor"
-        />
-        <path
-            d="M10.875 17.5C10.875 18.3284 11.5966 19 12.5 19C13.4034 19 14.125 18.3284 14.125 17.5C14.125 16.6716 13.4034 16 12.5 16C11.5966 16 10.875 16.6716 10.875 17.5Z"
-            fill="currentColor"
-        />
-    </svg>
-);
-
-
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -102,18 +77,19 @@ export function Chatbot() {
   return (
     <>
       <Button
-        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50"
+        variant="ghost"
+        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50 p-0 text-accent hover:bg-accent/10"
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
       >
-        <GeminiIcon className="h-10 w-10" />
+        <Sparkles className="h-10 w-10" />
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex flex-col p-0 w-full sm:max-w-md">
           <SheetHeader className="p-4 border-b">
             <SheetTitle className="flex items-center gap-2 font-headline text-accent">
-              <GeminiIcon className="h-5 w-5" />
+              <Sparkles className="h-5 w-5" />
               Assistant Pharmacien
             </SheetTitle>
           </SheetHeader>
@@ -124,7 +100,7 @@ export function Chatbot() {
                 <div key={message.id} className={`flex items-end gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                   {message.role === 'assistant' && (
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><GeminiIcon className="h-5 w-5"/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><Sparkles className="h-5 w-5"/></AvatarFallback>
                     </Avatar>
                   )}
                   <div className={`max-w-[80%] rounded-xl px-4 py-2 ${message.role === 'user' ? 'bg-accent text-accent-foreground' : 'bg-muted'}`}>
@@ -140,7 +116,7 @@ export function Chatbot() {
               {isLoading && (
                 <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><GeminiIcon className="h-5 w-5"/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><Sparkles className="h-5 w-5"/></AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-xl px-4 py-3">
                         <LoaderCircle className="animate-spin h-5 w-5" />
