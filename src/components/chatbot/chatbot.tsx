@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -77,11 +76,11 @@ export function Chatbot() {
   return (
     <>
       <Button
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
+        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50"
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
       >
-        <Sparkles className="h-8 w-8" />
+        <Sparkles className="h-10 w-10" />
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
