@@ -12,6 +12,7 @@ import { incrementLikeAction } from './actions'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CommentSection } from './CommentSection'
+import { cn } from '@/lib/utils'
 
 interface HealthPostCardProps {
   post: HealthPost
