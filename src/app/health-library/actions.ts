@@ -12,31 +12,15 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
   }
 
   try {
-    // 1. Fetch the current post to get the current likes count
-    const { data: post, error: fetchError } = await supabaseAdmin
-      .from('health_posts')
-      .select('likes')
-      .eq('id', postId)
-      .single();
+    const functionName = unlike ? 'decrement_likes' : 'increment_likes';
+    const params = unlike ? { post_id_to_dec: postId } : { post_id_to_inc: postId };
+    const { error } = await supabaseAdmin.rpc(functionName, params);
 
-    if (fetchError || !post) {
-      console.error('Error fetching post for like update:', fetchError);
-      return { success: false, error: "Le post est introuvable." };
-    }
-
-    // 2. Calculate the new likes count
-    const currentLikes = post.likes || 0;
-    // Ensure likes don't go below zero
-    const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
-
-    // 3. Update the post with the new count
-    const { error: updateError } = await supabaseAdmin
-      .from('health_posts')
-      .update({ likes: newLikes })
-      .eq('id', postId);
-
-    if (updateError) {
-      console.error('Error updating likes:', updateError);
+    if (error) {
+      console.error(`Error calling ${functionName} RPC:`, error);
+      if (error.code === '42883') { // undefined_function
+        return { success: false, error: `La fonction '${functionName}' est introuvable. Veuillez exécuter le script SQL fourni.` };
+      }
       return { success: false, error: "Erreur lors de la mise à jour du like." };
     }
 
