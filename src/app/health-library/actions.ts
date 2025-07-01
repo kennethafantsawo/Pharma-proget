@@ -8,23 +8,46 @@ import type { HealthPostComment } from '@/lib/types'
 
 export async function incrementLikeAction(postId: number, unlike: boolean = false): Promise<{ success: boolean; error?: string }> {
   if (!supabaseAdmin) {
-    return { success: false, error: "Configuration serveur manquante." }
+    return { success: false, error: "Configuration serveur manquante." };
   }
 
-  const rpc_name = unlike ? 'decrement_likes' : 'increment_likes'
+  try {
+    // 1. Fetch the current post to get the current likes count
+    const { data: post, error: fetchError } = await supabaseAdmin
+      .from('health_posts')
+      .select('likes')
+      .eq('id', postId)
+      .single();
 
-  // We use an RPC call to a database function for an atomic increment/decrement.
-  const { error } = await supabaseAdmin.rpc(rpc_name, {
-    post_id_to_inc: postId,
-  })
+    if (fetchError || !post) {
+      console.error('Error fetching post for like update:', fetchError);
+      return { success: false, error: "Le post est introuvable." };
+    }
 
-  if (error) {
-    console.error(`Error in ${rpc_name}:`, error)
-    return { success: false, error: "Erreur lors de la mise à jour du like." }
+    // 2. Calculate the new likes count
+    const currentLikes = post.likes || 0;
+    // Ensure likes don't go below zero
+    const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+
+    // 3. Update the post with the new count
+    const { error: updateError } = await supabaseAdmin
+      .from('health_posts')
+      .update({ likes: newLikes })
+      .eq('id', postId);
+
+    if (updateError) {
+      console.error('Error updating likes:', updateError);
+      return { success: false, error: "Erreur lors de la mise à jour du like." };
+    }
+
+    revalidatePath('/health-library');
+    return { success: true };
+
+  } catch (error) {
+    console.error('Unexpected error in incrementLikeAction:', error);
+    const message = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    return { success: false, error: message };
   }
-
-  revalidatePath('/health-library')
-  return { success: true }
 }
 
 export async function getCommentsAction(postId: number): Promise<{ success: boolean; data?: HealthPostComment[], error?: string }> {
