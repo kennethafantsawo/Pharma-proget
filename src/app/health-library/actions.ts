@@ -12,30 +12,16 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
   }
 
   try {
-    // 1. Fetch the current post to get the current number of likes
-    const { data: post, error: fetchError } = await supabaseAdmin
-      .from('health_posts')
-      .select('likes')
-      .eq('id', postId)
-      .single();
+    const rpcName = unlike ? 'decrement_likes' : 'increment_likes';
+    const params = unlike ? { post_id_to_dec: postId } : { post_id_to_inc: postId };
+    
+    const { error } = await supabaseAdmin.rpc(rpcName, params);
 
-    if (fetchError || !post) {
-      console.error('Error fetching post for like update:', fetchError);
-      return { success: false, error: "Fiche santé introuvable." };
-    }
-
-    // 2. Calculate the new number of likes
-    const currentLikes = post.likes || 0;
-    const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
-
-    // 3. Update the post with the new number of likes
-    const { error: updateError } = await supabaseAdmin
-      .from('health_posts')
-      .update({ likes: newLikes })
-      .eq('id', postId);
-
-    if (updateError) {
-      console.error('Error updating likes:', updateError);
+    if (error) {
+      console.error(`Error calling RPC ${rpcName}:`, error);
+      if (error.message.includes('function') && error.message.includes('does not exist')) {
+        return { success: false, error: "Une fonction nécessaire manque dans la base de données. Veuillez exécuter le script SQL fourni précédemment." };
+      }
       return { success: false, error: "Erreur lors de la mise à jour du like." };
     }
 
