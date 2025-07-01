@@ -1,5 +1,5 @@
 
-import { Facebook, Instagram } from 'lucide-react';
+import { Facebook, Instagram, Mail } from 'lucide-react';
 
 const WhatsAppIcon = () => (
     <svg
@@ -27,6 +27,13 @@ export function Footer() {
           <span className="font-semibold text-foreground">Kenneth AFANTSAWO</span>
         </p>
         <div className="flex items-center gap-4">
+          <a
+            href="mailto:kennethafantsawo@gmail.com"
+            aria-label="Email"
+            className="text-muted-foreground hover:text-accent transition-colors"
+          >
+            <Mail className="h-6 w-6" />
+          </a>
           <a
             href="http://wa.me/22896417270"
             target="_blank"
