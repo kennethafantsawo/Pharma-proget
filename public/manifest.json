@@ -4,18 +4,20 @@
   "description": "Trouvez facilement les pharmacies de garde à Lomé, Togo. Fonctionne hors ligne.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#E6F6F2",
-  "theme_color": "#008080",
+  "background_color": "#ffffff",
+  "theme_color": "#1066de",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

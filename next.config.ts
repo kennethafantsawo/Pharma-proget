@@ -1,7 +1,29 @@
+const withPWA = require('@ducanh2912/next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+  runtimeCaching: [
+    {
+      urlPattern: ({ url }) => {
+        return url.origin.startsWith('https://') && url.hostname.endsWith('supabase.co');
+      },
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'supabase-data-cache',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+  ],
+});
 
-import type {NextConfig} from 'next';
-
-const remotePatterns: NextConfig['images']['remotePatterns'] = [
+const remotePatterns = [
   {
     protocol: 'https',
     hostname: 'placehold.co',
@@ -33,7 +55,8 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
   }
 }
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -46,4 +69,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+
+module.exports = withPWA(nextConfig);
