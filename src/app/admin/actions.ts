@@ -234,32 +234,3 @@ export async function deleteHealthPostAction(
     return { success: false, message: `Échec de la suppression : ${message}` };
   }
 }
-
-export async function incrementLikeAction(postId: number, unlike: boolean = false): Promise<{ success: boolean; error?: string }> {
-  if (!supabaseAdmin) {
-    return { success: false, error: "Configuration serveur manquante." };
-  }
-
-  try {
-    const rpcName = unlike ? 'decrement_likes' : 'increment_likes';
-    const params = unlike ? { post_id_to_dec: postId } : { post_id_to_inc: postId };
-    
-    const { error } = await supabaseAdmin.rpc(rpcName, params);
-
-    if (error) {
-      console.error(`Error calling RPC ${rpcName}:`, error);
-      if (error.message.includes('function') && error.message.includes('does not exist')) {
-        return { success: false, error: `La fonction '${rpcName}' est manquante dans la base de données. Veuillez exécuter le script SQL pour l'ajouter.` };
-      }
-      return { success: false, error: "Erreur lors de la mise à jour du like. Assurez-vous d'avoir exécuté le script SQL nécessaire." };
-    }
-
-    revalidatePath('/health-library');
-    return { success: true };
-
-  } catch (error) {
-    console.error('Unexpected error in incrementLikeAction:', error);
-    const message = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
-    return { success: false, error: message };
-  }
-}

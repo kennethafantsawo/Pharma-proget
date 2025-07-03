@@ -22,7 +22,8 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
        if (error.message.includes('function') && error.message.includes('does not exist')) {
         return { success: false, error: `La fonction '${rpcName}' est manquante dans la base de données. Veuillez exécuter le script SQL pour l'ajouter.` };
       }
-      return { success: false, error: "Erreur lors de la mise à jour du like. Assurez-vous d'avoir exécuté le script SQL nécessaire." };
+      // Return the specific database error to help with debugging
+      return { success: false, error: `Erreur de base de données : ${error.message}` };
     }
 
     revalidatePath('/health-library');
