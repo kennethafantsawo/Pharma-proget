@@ -1,3 +1,4 @@
+
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
@@ -11,6 +12,7 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
   }
 
   try {
+    // Étape 1 : Récupérer le nombre de "J'aime" actuel.
     const { data: post, error: fetchError } = await supabaseAdmin
       .from('health_posts')
       .select('likes')
@@ -18,20 +20,15 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
       .single();
 
     if (fetchError) {
-      console.error('Like Action - Erreur de récupération:', fetchError.message);
-      if (fetchError.message.includes('column "likes" does not exist')) {
-          return { success: false, error: "La colonne 'likes' est manquante. Veuillez exécuter le script SQL pour l'ajouter." };
-      }
-      return { success: false, error: "Impossible de trouver la fiche santé. A-t-elle été supprimée ?" };
+      console.error('Like Action - Erreur de récupération:', fetchError);
+      return { success: false, error: "Impossible de trouver la fiche santé pour la mettre à jour. Assurez-vous que le script SQL a bien été exécuté." };
     }
 
-    if (!post) {
-      return { success: false, error: "Impossible de trouver la fiche santé (ID introuvable)." };
-    }
-
+    // Étape 2 : Calculer le nouveau nombre de "J'aime".
     const currentLikes = post.likes || 0;
     const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
 
+    // Étape 3 : Mettre à jour la fiche avec le nouveau décompte.
     const { error: updateError } = await supabaseAdmin
       .from('health_posts')
       .update({ likes: newLikes })
@@ -39,7 +36,7 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
 
     if (updateError) {
       console.error('Like Action - Erreur de mise à jour:', updateError);
-      return { success: false, error: `Erreur de base de données : ${updateError.message}` };
+      return { success: false, error: `Erreur de base de données lors de la mise à jour : ${updateError.message}` };
     }
 
     revalidatePath('/health-library');
