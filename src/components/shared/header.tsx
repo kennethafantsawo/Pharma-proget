@@ -2,10 +2,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, PlusSquare, BookOpen, Pill, Star, Settings, FileText } from 'lucide-react';
+import { Menu, BookOpen, Pill, Star, Settings, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 
@@ -46,7 +47,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
-          <PlusSquare className="h-7 w-7 text-accent" />
+          <Image src="/logo.png" alt="PharmaGuard Logo" width={28} height={28} className="h-7 w-7" />
           <span className="text-xl font-bold text-accent font-headline">
             PharmaGuard
           </span>
