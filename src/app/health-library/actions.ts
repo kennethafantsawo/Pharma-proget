@@ -12,23 +12,27 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
   }
 
   try {
-    // Étape 1 : Récupérer la fiche pour s'assurer qu'elle existe et obtenir le nombre de "J'aime".
     const { data: post, error: fetchError } = await supabaseAdmin
       .from('health_posts')
       .select('likes')
       .eq('id', postId)
       .single();
 
-    if (fetchError || !post) {
-      console.error('Like Action - Erreur de récupération:', fetchError);
+    if (fetchError) {
+      console.error('Like Action - Erreur de récupération:', fetchError.message);
+      if (fetchError.message.includes('column "likes" does not exist')) {
+          return { success: false, error: "La colonne 'likes' est manquante. Veuillez exécuter le script SQL pour l'ajouter." };
+      }
       return { success: false, error: "Impossible de trouver la fiche santé. A-t-elle été supprimée ?" };
     }
 
-    // Étape 2 : Calculer le nouveau nombre de "J'aime".
+    if (!post) {
+      return { success: false, error: "Impossible de trouver la fiche santé (ID introuvable)." };
+    }
+
     const currentLikes = post.likes || 0;
     const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
 
-    // Étape 3 : Mettre à jour la fiche avec le nouveau décompte.
     const { error: updateError } = await supabaseAdmin
       .from('health_posts')
       .update({ likes: newLikes })
