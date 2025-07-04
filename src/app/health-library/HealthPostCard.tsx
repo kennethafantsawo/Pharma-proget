@@ -146,12 +146,12 @@ export function HealthPostCard({ post }: HealthPostCardProps) {
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="rounded-full hover:bg-blue-500/10 hover:text-blue-500 flex items-center gap-2">
                   <MessageCircle className="h-5 w-5" />
-                  <span className="text-sm font-medium">{commentCount !== null && commentCount > 0 ? commentCount : ''}</span>
+                  <span className="text-sm font-medium">{commentCount !== null ? commentCount : ''}</span>
                 </Button>
               </CollapsibleTrigger>
               <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLikePending} className={cn("rounded-full hover:bg-pink-500/10 hover:text-pink-500 flex items-center gap-2", isLiked && "text-pink-500")}>
                 {isLikePending ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Heart className={cn('h-5 w-5', isLiked ? 'fill-current' : '')} />}
-                <span className="text-sm font-medium">{likes > 0 ? likes : ''}</span>
+                <span className="text-sm font-medium">{likes}</span>
               </Button>
               <Button variant="ghost" size="sm" className="rounded-full hover:bg-green-500/10 hover:text-green-500" onClick={handleShare}>
                 <Share2 className="h-5 w-5" />
