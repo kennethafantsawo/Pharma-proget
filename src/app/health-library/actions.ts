@@ -12,26 +12,38 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
   }
 
   try {
-    const rpcName = unlike ? 'decrement_likes' : 'increment_likes';
-    const params = unlike ? { post_id_to_dec: postId } : { post_id_to_inc: postId };
-    
-    const { error } = await supabaseAdmin.rpc(rpcName, params);
+    // Étape 1 : Récupérer la fiche pour s'assurer qu'elle existe et obtenir le nombre de "J'aime".
+    const { data: post, error: fetchError } = await supabaseAdmin
+      .from('health_posts')
+      .select('likes')
+      .eq('id', postId)
+      .single();
 
-    if (error) {
-      console.error(`Error calling RPC ${rpcName}:`, error);
-       if (error.message.includes('function') && error.message.includes('does not exist')) {
-        return { success: false, error: `La fonction '${rpcName}' est manquante dans la base de données. Veuillez exécuter le script SQL pour l'ajouter.` };
-      }
-      // Return the specific database error to help with debugging
-      return { success: false, error: `Erreur de base de données : ${error.message}` };
+    if (fetchError || !post) {
+      console.error('Like Action - Erreur de récupération:', fetchError);
+      return { success: false, error: "Impossible de trouver la fiche santé. A-t-elle été supprimée ?" };
+    }
+
+    // Étape 2 : Calculer le nouveau nombre de "J'aime".
+    const currentLikes = post.likes || 0;
+    const newLikes = unlike ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+
+    // Étape 3 : Mettre à jour la fiche avec le nouveau décompte.
+    const { error: updateError } = await supabaseAdmin
+      .from('health_posts')
+      .update({ likes: newLikes })
+      .eq('id', postId);
+
+    if (updateError) {
+      console.error('Like Action - Erreur de mise à jour:', updateError);
+      return { success: false, error: `Erreur de base de données : ${updateError.message}` };
     }
 
     revalidatePath('/health-library');
     return { success: true };
-
   } catch (error) {
-    console.error('Unexpected error in incrementLikeAction:', error);
     const message = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    console.error('Like Action - Erreur inattendue:', error);
     return { success: false, error: message };
   }
 }
