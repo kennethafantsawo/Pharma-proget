@@ -104,7 +104,7 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
-        className="fixed bottom-16 right-5 z-50 h-10 w-10 cursor-pointer transition-transform hover:scale-110"
+        className="fixed bottom-16 right-5 z-50 h-14 w-14 cursor-pointer transition-transform hover:scale-110 border-2 border-white rounded-2xl shadow-lg"
       >
         <CustomSparkleIcon className="h-full w-full" />
       </button>
