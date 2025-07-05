@@ -55,11 +55,13 @@ export async function updatePharmaciesAction(password: string, newSchedules: any
       const weekId = weekData.id;
 
       if (schedule.pharmacies && schedule.pharmacies.length > 0) {
-        const pharmaciesToInsert = schedule.pharmacies.map(p => ({
+        const pharmaciesToInsert = schedule.pharmacies.map((p: any) => ({
           nom: p.nom,
           localisation: p.localisation,
           contact1: p.contact1,
           contact2: p.contact2,
+          latitude: p.latitude || null,
+          longitude: p.longitude || null,
           week_id: weekId,
         }));
 

@@ -43,7 +43,7 @@ export const usePharmacies = () => {
         // Fetch data from Supabase
         const { data: schedules, error: fetchError } = await supabase
             .from('weeks')
-            .select('semaine, pharmacies(nom, localisation, contact1, contact2)')
+            .select('semaine, pharmacies(nom, localisation, contact1, contact2, latitude, longitude)')
             .order('semaine', { ascending: true }); // Basic sort from DB
         
         if (fetchError) {

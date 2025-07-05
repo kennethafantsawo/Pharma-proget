@@ -20,6 +20,8 @@ export type Database = {
           localisation: string
           contact1: string
           contact2: string
+          latitude: number | null
+          longitude: number | null
         }
       }
       health_posts: {
