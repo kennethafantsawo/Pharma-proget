@@ -11,7 +11,7 @@ const sora = Sora({ subsets: ['latin'], variable: '--font-sora' });
 export const metadata: Metadata = {
   title: 'PharmaGuard',
   description: 'Trouvez facilement les pharmacies de garde à Lomé, Togo. Fonctionne hors ligne.',
-  manifest: '/manifest.json',
+  // Le lien vers le manifest est maintenant ajouté manuellement dans le <head> pour plus de fiabilité.
 };
 
 export default function RootLayout({
@@ -22,8 +22,10 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#2563eb" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={`${inter.variable} ${sora.variable} font-body antialiased`}>
         <ThemeProvider
