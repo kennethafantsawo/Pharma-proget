@@ -1,11 +1,10 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Send, X, LoaderCircle, User, Sparkles } from 'lucide-react';
+import { Send, X, LoaderCircle, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,32 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { pharmacyChatbot, type PharmacyChatbotOutput } from '@/ai/flows/pharmacy-chatbot';
+
+const CustomSparkleIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      viewBox="0 0 59 58"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M29.5 0L36.0858 22.9142L59 29L36.0858 35.0858L29.5 58L22.9142 35.0858L0 29L22.9142 22.9142L29.5 0Z"
+        fill="#00C1F3"
+      />
+      <path
+        d="M50.5 13L53.4423 21.7157L62 24.5L53.4423 27.2843L50.5 36L47.5577 27.2843L39 24.5L47.5577 21.7157L50.5 13Z"
+        fill="#98E6FF"
+      />
+      <path
+        d="M50.5 45L52.3212 50.1788L57 52L52.3212 53.8212L50.5 59L48.6788 53.8212L44 52L48.6788 50.1788L50.5 45Z"
+        fill="#51D7C7"
+      />
+      <path d="M11 15.5H23" stroke="#40B5E6" strokeWidth="5" />
+      <path d="M17 21.5L17 9.5" stroke="#40B5E6" strokeWidth="5" />
+    </svg>
+  );
+};
 
 type Message = {
   id: number;
@@ -78,18 +103,18 @@ export function Chatbot() {
     <>
       <Button
         variant="ghost"
-        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50 p-0 text-green-500 hover:bg-green-500/10"
+        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50 p-0 flex items-center justify-center bg-card hover:bg-muted/50"
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
       >
-        <Sparkles className="h-14 w-14 fill-current" />
+        <CustomSparkleIcon className="h-12 w-12" />
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex flex-col p-0 w-full sm:max-w-md">
           <SheetHeader className="p-4 border-b">
             <SheetTitle className="flex items-center gap-2 font-headline text-accent">
-              <Sparkles className="h-5 w-5" />
+              <CustomSparkleIcon className="h-5 w-5" />
               Assistant Pharmacien
             </SheetTitle>
           </SheetHeader>
@@ -100,7 +125,7 @@ export function Chatbot() {
                 <div key={message.id} className={`flex items-end gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                   {message.role === 'assistant' && (
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><Sparkles className="h-5 w-5"/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><CustomSparkleIcon className="h-5 w-5"/></AvatarFallback>
                     </Avatar>
                   )}
                   <div className={`max-w-[80%] rounded-xl px-4 py-2 ${message.role === 'user' ? 'bg-accent text-accent-foreground' : 'bg-muted'}`}>
@@ -116,7 +141,7 @@ export function Chatbot() {
               {isLoading && (
                 <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 border bg-accent/20">
-                      <AvatarFallback className="bg-transparent text-accent"><Sparkles className="h-5 w-5"/></AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-accent"><CustomSparkleIcon className="h-5 w-5"/></AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-xl px-4 py-3">
                         <LoaderCircle className="animate-spin h-5 w-5" />
