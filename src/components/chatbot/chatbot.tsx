@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -105,7 +104,7 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
-        className="fixed bottom-16 right-5 z-50 h-16 w-16 cursor-pointer transition-transform hover:scale-110"
+        className="fixed bottom-16 right-5 z-50 h-10 w-10 cursor-pointer transition-transform hover:scale-110"
       >
         <CustomSparkleIcon className="h-full w-full" />
       </button>
