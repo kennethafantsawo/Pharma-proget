@@ -64,6 +64,7 @@ export function Chatbot() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [bottom, setBottom] = useState(24); // Default: 24px (1.5rem)
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -78,6 +79,28 @@ export function Chatbot() {
       }, 100);
     }
   }, [messages, isOpen]);
+
+  useEffect(() => {
+    const footer = document.getElementById('page-footer');
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const footerHeight = footer.getBoundingClientRect().height;
+          setBottom(footerHeight + 24); // Move button up by footer height + 24px margin
+        } else {
+          setBottom(24); // Reset to default position
+        }
+      },
+      { threshold: 0.1 } // Trigger when 10% of footer is visible
+    );
+
+    observer.observe(footer);
+
+    return () => observer.disconnect();
+  }, []);
+
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -107,9 +130,10 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
-        className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110 drop-shadow-xl"
+        className="fixed right-5 z-50 cursor-pointer transition-all duration-300 ease-out hover:scale-110 drop-shadow-xl"
+        style={{ bottom: `${bottom}px` }}
       >
-        <Avatar className="h-14 w-14 border bg-accent/20">
+        <Avatar className="h-14 w-14 border-2 border-accent/50 bg-accent/20">
           <AvatarFallback className="bg-transparent text-accent">
             <CustomSparkleIcon className="h-8 w-8" />
           </AvatarFallback>

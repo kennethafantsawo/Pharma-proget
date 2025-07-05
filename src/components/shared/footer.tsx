@@ -20,7 +20,7 @@ const WhatsAppIcon = () => (
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background">
+    <footer id="page-footer" className="border-t bg-background">
       <div className="container mx-auto px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground text-center sm:text-left">
           Powered by{' '}
