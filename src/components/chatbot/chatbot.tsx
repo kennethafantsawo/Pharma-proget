@@ -105,9 +105,9 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
-        className="fixed bottom-16 right-5 z-50 h-16 w-16 cursor-pointer transition-transform hover:scale-110 border-2 border-white rounded-2xl shadow-lg flex items-center justify-center"
+        className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110"
       >
-        <CustomSparkleIcon className="h-10 w-10" />
+        <CustomSparkleIcon className="h-16 w-16 drop-shadow-lg" />
       </button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
