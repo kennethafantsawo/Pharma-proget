@@ -101,14 +101,13 @@ export function Chatbot() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-50 p-0 flex items-center justify-center bg-card hover:bg-muted/50"
+      <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
+        className="fixed bottom-16 right-5 z-50 h-20 w-20 cursor-pointer transition-transform hover:scale-110"
       >
-        <CustomSparkleIcon className="h-12 w-12" />
-      </Button>
+        <CustomSparkleIcon className="h-full w-full" />
+      </button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex flex-col p-0 w-full sm:max-w-md">
