@@ -67,8 +67,14 @@ export const usePharmacies = () => {
           setData([]);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching data.');
-        console.error(err);
+        console.error("Erreur détaillée dans usePharmacies:", err);
+        let errorMessage = "Une erreur inconnue est survenue lors de la récupération des données. Essayez de rafraîchir la page. Si le problème persiste, votre navigateur est peut-être obsolète.";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        } else if (typeof err === 'string') {
+            errorMessage = err;
+        }
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

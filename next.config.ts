@@ -1,26 +1,9 @@
+
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  runtimeCaching: [
-    {
-      urlPattern: ({ url }) => {
-        return url.origin.startsWith('https://') && url.hostname.endsWith('supabase.co');
-      },
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'supabase-data-cache',
-        expiration: {
-          maxEntries: 10,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-        cacheableResponse: {
-          statuses: [0, 200],
-        },
-      },
-    },
-  ],
 });
 
 const remotePatterns = [
