@@ -60,8 +60,6 @@ export async function updatePharmaciesAction(password: string, newSchedules: any
           localisation: p.localisation,
           contact1: p.contact1,
           contact2: p.contact2,
-          latitude: p.latitude || null,
-          longitude: p.longitude || null,
           week_id: weekId,
         }));
 

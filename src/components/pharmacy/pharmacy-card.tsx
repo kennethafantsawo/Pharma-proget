@@ -1,12 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, LocateFixed } from 'lucide-react';
+import { Phone, MapPin } from 'lucide-react';
 import type { Pharmacy } from '@/lib/types';
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
-  distance?: number | null;
 }
 
 const WhatsAppIcon = () => (
@@ -27,31 +26,15 @@ const WhatsAppIcon = () => (
 );
 
 
-export function PharmacyCard({ pharmacy, distance }: PharmacyCardProps) {
+export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   const whatsAppNumber = pharmacy.contact2.startsWith('+') ? pharmacy.contact2.substring(1) : pharmacy.contact2;
-
-  const displayDistance = () => {
-    if (distance === undefined || distance === null || distance === Infinity) return null;
-    if (distance < 1) {
-      return `${Math.round(distance * 1000)} m`;
-    }
-    return `${distance.toFixed(1)} km`;
-  };
 
   return (
     <Card className="w-full h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
-        <div className="flex justify-between items-start gap-2">
-            <CardTitle className="font-headline text-xl text-accent">
-            {pharmacy.nom}
-            </CardTitle>
-            {displayDistance() && (
-                <div className="flex-shrink-0 flex items-center gap-1 text-sm text-muted-foreground font-medium bg-secondary px-2 py-1 rounded-full">
-                    <LocateFixed className="h-4 w-4 text-accent" />
-                    <span>{displayDistance()}</span>
-                </div>
-            )}
-        </div>
+        <CardTitle className="font-headline text-xl text-accent">
+          {pharmacy.nom}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-start justify-between gap-3 text-muted-foreground">

@@ -4,8 +4,6 @@ export interface Pharmacy {
   localisation: string;
   contact1: string;
   contact2: string;
-  latitude?: number | null;
-  longitude?: number | null;
 }
 
 export interface WeekSchedule {
