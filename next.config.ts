@@ -49,59 +49,6 @@ const nextConfig = {
   images: {
     remotePatterns,
   },
-  async headers() {
-    const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL 
-      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname 
-      : 'pooariitfzfacjafwkkp.supabase.co';
-
-    // Note: 'unsafe-eval' is required for Next.js in development mode.
-    // 'unsafe-inline' is needed for next-themes and some UI libraries.
-    // For a production build, these could be tightened using a nonce with middleware.
-    const cspDirectives = {
-      'default-src': ["'self'"],
-      'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-      'style-src': ["'self'", "'unsafe-inline'"],
-      'img-src': ["'self'", 'data:', 'https://placehold.co', `https://${supabaseHostname}`],
-      'connect-src': ["'self'", `https://${supabaseHostname}`, `wss://${supabaseHostname}`],
-      'font-src': ["'self'"],
-      'object-src': ["'none'"],
-      'base-uri': ["'self'"],
-      'form-action': ["'self'"],
-      'frame-ancestors': ["'none'"],
-    };
-
-    const csp = Object.entries(cspDirectives)
-      .map(([key, value]) => `${key} ${value.join(' ')}`)
-      .join('; ');
-
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: csp,
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-    ];
-  },
 };
 
 
