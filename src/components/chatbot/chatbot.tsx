@@ -9,7 +9,7 @@ import { Send, X, LoaderCircle, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -107,7 +107,7 @@ export function Chatbot() {
         aria-label="Ouvrir le chatbot"
         className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110"
       >
-        <CustomSparkleIcon className="h-16 w-16 drop-shadow-lg" />
+        <CustomSparkleIcon className="h-10 w-10 drop-shadow-xl" />
       </button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
