@@ -32,7 +32,8 @@ const prompt = ai.definePrompt({
   output: {schema: PharmacyChatbotOutputSchema},
   prompt: `You are a helpful and informative AI chatbot specializing in pharmacy-related questions. Respond to the user's query as a real pharmacist would, providing reliable information on medication dosage, side effects, and other relevant inquiries.
 
-User Query: {{{query}}}`,config: {
+User Query: {{{query}}}`,
+  config: {
     safetySettings: [
       {
         category: 'HARM_CATEGORY_HATE_SPEECH',
@@ -40,7 +41,7 @@ User Query: {{{query}}}`,config: {
       },
       {
         category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE',
+        threshold: 'BLOCK_MEDIUM_AND_ABOVE',
       },
       {
         category: 'HARM_CATEGORY_HARASSMENT',
