@@ -70,9 +70,11 @@ export function Chatbot() {
   });
 
   useEffect(() => {
-    if (isOpen && scrollAreaRef.current) {
+    if (isOpen) {
       setTimeout(() => {
-        scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+        }
       }, 100);
     }
   }, [messages, isOpen]);
@@ -105,9 +107,9 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Ouvrir le chatbot"
-        className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110"
+        className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110 drop-shadow-xl"
       >
-        <CustomSparkleIcon className="h-10 w-10 drop-shadow-xl" />
+        <CustomSparkleIcon className="h-10 w-10" />
       </button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
