@@ -109,7 +109,11 @@ export function Chatbot() {
         aria-label="Ouvrir le chatbot"
         className="fixed bottom-16 right-5 z-50 cursor-pointer transition-transform hover:scale-110 drop-shadow-xl"
       >
-        <CustomSparkleIcon className="h-10 w-10" />
+        <Avatar className="h-14 w-14 border bg-accent/20">
+          <AvatarFallback className="bg-transparent text-accent">
+            <CustomSparkleIcon className="h-8 w-8" />
+          </AvatarFallback>
+        </Avatar>
       </button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
