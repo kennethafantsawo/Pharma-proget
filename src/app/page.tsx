@@ -30,6 +30,7 @@ export default function Home() {
   } = usePharmacies();
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
 
   const filteredPharmacies = useMemo(() => {
     if (!currentSchedule) return [];
@@ -95,12 +96,18 @@ export default function Home() {
         {!pharmaciesLoading && !pharmaciesError && (
             currentSchedule ? (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    <div className="lg:col-span-2 space-y-6">
+                    <div 
+                        className="lg:col-span-2 space-y-6"
+                        onMouseLeave={() => setSelectedPharmacy(null)}
+                    >
                         {filteredPharmacies.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredPharmacies.map((pharmacy) => (
                                     <div key={pharmacy.nom}>
-                                        <PharmacyCard pharmacy={pharmacy} />
+                                        <PharmacyCard 
+                                            pharmacy={pharmacy} 
+                                            onMouseEnter={() => setSelectedPharmacy(pharmacy)}
+                                        />
                                     </div>
                                 ))}
                             </div>
@@ -115,7 +122,7 @@ export default function Home() {
                         )}
                     </div>
                     <aside className="hidden lg:block sticky top-24">
-                        <MapDisplay />
+                        <MapDisplay selectedPharmacy={selectedPharmacy} />
                     </aside>
                 </div>
             ) : (
