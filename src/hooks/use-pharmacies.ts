@@ -33,7 +33,7 @@ export const usePharmacies = () => {
       setError(null);
 
       if (!supabase) {
-        setError("Configuration Supabase manquante. Veuillez vérifier votre fichier .env.local.");
+        setError("Configuration Supabase manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY à votre fichier .env.");
         setData([]);
         setLoading(false);
         return;

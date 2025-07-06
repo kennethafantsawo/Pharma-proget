@@ -8,7 +8,7 @@ import type { HealthPostComment } from '@/lib/types'
 
 export async function incrementLikeAction(postId: number, unlike: boolean = false): Promise<{ success: boolean; error?: string }> {
   if (!supabaseAdmin) {
-    return { success: false, error: "Configuration serveur manquante." };
+    return { success: false, error: "Configuration Supabase (côté serveur) manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY à votre fichier .env." };
   }
 
   try {
@@ -50,7 +50,7 @@ export async function incrementLikeAction(postId: number, unlike: boolean = fals
 
 export async function getCommentsAction(postId: number): Promise<{ success: boolean; data?: HealthPostComment[], error?: string }> {
     if (!supabaseAdmin) {
-        return { success: false, error: "Configuration serveur manquante." }
+        return { success: false, error: "Configuration Supabase (côté serveur) manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY à votre fichier .env." }
     }
 
     const { data, error } = await supabaseAdmin
@@ -74,7 +74,7 @@ const AddCommentSchema = z.object({
 
 export async function addCommentAction(formData: FormData): Promise<{ success: boolean; error?: string }> {
     if (!supabaseAdmin) {
-        return { success: false, error: "Configuration serveur manquante." }
+        return { success: false, error: "Configuration Supabase (côté serveur) manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY à votre fichier .env." }
     }
 
     const validatedFields = AddCommentSchema.safeParse({

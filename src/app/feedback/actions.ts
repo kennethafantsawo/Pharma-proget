@@ -12,7 +12,7 @@ export async function submitFeedbackAction(
   data: z.infer<typeof FeedbackSchema>
 ): Promise<{ success: boolean; error?: string }> {
   if (!supabaseAdmin) {
-    return { success: false, error: 'Configuration serveur manquante.' };
+    return { success: false, error: "Configuration Supabase (côté serveur) manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY à votre fichier .env." };
   }
 
   const validatedData = FeedbackSchema.safeParse(data);

@@ -8,7 +8,7 @@ import { HealthPostCard } from './HealthPostCard';
 
 async function getHealthPosts(): Promise<{ posts: HealthPost[] | null; error: string | null }> {
   if (!supabase) {
-    return { posts: null, error: "La connexion à la base de données a échoué. Veuillez vérifier la configuration." };
+    return { posts: null, error: "Configuration Supabase manquante. Veuillez ajouter NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY à votre fichier .env." };
   }
   const { data, error } = await supabase
     .from('health_posts')
