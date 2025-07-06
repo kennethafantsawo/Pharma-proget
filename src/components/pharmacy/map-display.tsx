@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,10 +46,15 @@ export function MapDisplay({ selectedPharmacy }: MapDisplayProps) {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center p-4">
               <AlertTriangle className="h-8 w-8 text-destructive mb-2" />
-              <p className="font-semibold text-destructive">Clé API Google Maps manquante</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Veuillez ajouter votre clé à la variable <code className="font-mono text-xs bg-muted p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> dans le fichier <code className="font-mono text-xs bg-muted p-1 rounded">.env</code>.
+              <p className="font-semibold text-destructive mb-2">Carte non disponible</p>
+              <p className="text-xs text-muted-foreground">
+                Pour afficher la carte, une clé API Google Maps est nécessaire.
               </p>
+              <ul className="text-left text-xs text-muted-foreground mt-3 space-y-1 list-disc list-inside">
+                 <li>Ajoutez votre clé à la variable <code className="font-mono bg-muted p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> dans le fichier <code className="font-mono bg-muted p-1 rounded">.env</code>.</li>
+                 <li>Assurez-vous que l'API "Maps Embed API" est activée sur votre projet Google Cloud.</li>
+                 <li>Vérifiez que votre projet est bien associé à un compte de facturation.</li>
+              </ul>
             </div>
           )}
         </div>
