@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, MapPin } from 'lucide-react';
@@ -6,7 +5,6 @@ import type { Pharmacy } from '@/lib/types';
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
-  onMouseEnter: () => void;
 }
 
 const WhatsAppIcon = () => (
@@ -27,13 +25,13 @@ const WhatsAppIcon = () => (
 );
 
 
-export function PharmacyCard({ pharmacy, onMouseEnter }: PharmacyCardProps) {
+export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   const whatsAppNumber = pharmacy.contact2.startsWith('+') ? pharmacy.contact2.substring(1) : pharmacy.contact2;
+  const mapQuery = encodeURIComponent(`Pharmacie ${pharmacy.nom}, ${pharmacy.localisation}, Lomé`);
 
   return (
     <Card 
         className="w-full h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-        onMouseEnter={onMouseEnter}
     >
       <CardHeader>
         <CardTitle className="font-headline text-xl text-accent">
@@ -41,10 +39,16 @@ export function PharmacyCard({ pharmacy, onMouseEnter }: PharmacyCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-start gap-3 text-muted-foreground">
+        <a 
+            href={`https://www.openstreetmap.org/search?query=${mapQuery}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Voir sur la carte"
+            className="flex items-start gap-3 text-muted-foreground hover:text-accent transition-colors"
+        >
           <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
           <span className="font-body">{pharmacy.localisation}</span>
-        </div>
+        </a>
         <div className="flex flex-wrap gap-2 pt-2">
           <Button asChild size="sm">
             <a href={`tel:${pharmacy.contact1}`}>
