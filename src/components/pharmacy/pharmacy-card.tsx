@@ -27,7 +27,7 @@ const WhatsAppIcon = () => (
 
 export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   const whatsAppNumber = pharmacy.contact2.startsWith('+') ? pharmacy.contact2.substring(1) : pharmacy.contact2;
-  const mapQuery = encodeURIComponent(`pharmacie ${pharmacy.nom} ${pharmacy.localisation}`);
+  const mapQuery = encodeURIComponent(`pharmacie ${pharmacy.nom} Lomé`);
   const mapUrl = `https://www.openstreetmap.org/search?query=${mapQuery}`;
 
   return (
