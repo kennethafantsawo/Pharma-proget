@@ -2,8 +2,9 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { MapPin, AlertCircle } from 'lucide-react';
 import type { Pharmacy } from '@/lib/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface MapDisplayProps {
   pharmacies: Pharmacy[];
@@ -11,51 +12,58 @@ interface MapDisplayProps {
 }
 
 export function MapDisplay({ pharmacies, selectedPharmacyName }: MapDisplayProps) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  const selectedPharmacy = pharmacies.find(p => p.nom === selectedPharmacyName);
+
+  let mapSrc = '';
+  // Check if apiKey is defined and not the placeholder value
+  const isApiKeySet = apiKey && apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY_HERE' && apiKey.trim() !== '';
+
+  if (isApiKeySet) {
+    const baseEmbedUrl = 'https://www.google.com/maps/embed/v1/';
+    if (selectedPharmacy) {
+      const query = `place?key=${apiKey}&q=${encodeURIComponent(`Pharmacie ${selectedPharmacy.nom}, ${selectedPharmacy.localisation}, Lomé, Togo`)}`;
+      mapSrc = `${baseEmbedUrl}${query}`;
+    } else {
+      // Default view of Lomé
+      const query = `view?key=${apiKey}&center=6.1374,1.2123&zoom=12`;
+      mapSrc = `${baseEmbedUrl}${query}`;
+    }
+  }
+
   return (
-    <Card className="h-full w-full flex flex-col">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-headline text-primary">
           <MapPin />
           Carte des Pharmacies
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-4">
-        <div 
-            data-ai-hint="map background"
-            className="relative flex-1 rounded-lg bg-muted/50 p-4 border-dashed border-2 bg-cover bg-center" 
-            style={{ backgroundImage: "url('https://placehold.co/600x400.png')" }}>
-          <div className="absolute inset-0 bg-background/50 backdrop-blur-sm"></div>
-          <div className="relative z-10 text-center">
-            <h3 className="font-semibold text-lg text-foreground">Vue Carte</h3>
-            <p className="text-sm text-muted-foreground">
-              La fonctionnalité de carte interactive sera disponible prochainement.
-            </p>
-          </div>
-        </div>
-        <div className="space-y-2">
-            <h4 className="font-semibold">Emplacements cette semaine:</h4>
-            <ul className="space-y-2">
-            {pharmacies.map((pharmacy) => (
-                <li key={pharmacy.nom} className="flex items-start justify-between gap-2 p-2 rounded-md bg-background hover:bg-accent/50">
-                    <div className="flex items-center gap-2">
-                        <MapPin className={`h-5 w-5 flex-shrink-0 ${pharmacy.nom === selectedPharmacyName ? 'text-primary' : 'text-muted-foreground'}`} />
-                        <div>
-                            <p className={`font-semibold ${pharmacy.nom === selectedPharmacyName ? 'text-primary' : ''}`}>{pharmacy.nom}</p>
-                            <p className="text-sm text-muted-foreground">{pharmacy.localisation}</p>
-                        </div>
-                    </div>
-                    <a
-                        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent('pharmacie ' + pharmacy.nom + ', Lomé, Togo')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                        title="Rechercher sur OpenStreetMap"
-                    >
-                        <MapPin className="h-5 w-5"/>
-                    </a>
-                </li>
-            ))}
-            </ul>
+      <CardContent>
+        <div className="relative aspect-video w-full rounded-lg bg-muted overflow-hidden border">
+          {isApiKeySet ? (
+            <iframe
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src={mapSrc}
+              title="Carte des pharmacies"
+            ></iframe>
+          ) : (
+             <div className="flex items-center justify-center h-full p-4 text-center">
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Configuration Requise</AlertTitle>
+                    <AlertDescription>
+                        Pour afficher la carte, ajoutez votre clé API Google Maps à la variable <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> dans le fichier <code>.env</code>.
+                    </AlertDescription>
+                </Alert>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
