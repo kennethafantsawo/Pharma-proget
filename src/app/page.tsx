@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { AlertCircle, CalendarX, Search, Frown } from 'lucide-react';
+import type { Pharmacy } from '@/lib/types';
 
 export default function Home() {
   const {
@@ -27,6 +28,7 @@ export default function Home() {
   } = usePharmacies();
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [hoveredPharmacy, setHoveredPharmacy] = useState<Pharmacy | null>(null);
 
   const filteredPharmacies = useMemo(() => {
     if (!currentSchedule) return [];
@@ -96,7 +98,11 @@ export default function Home() {
                         {filteredPharmacies.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredPharmacies.map((pharmacy) => (
-                                    <div key={pharmacy.nom}>
+                                    <div 
+                                      key={pharmacy.nom} 
+                                      onMouseEnter={() => setHoveredPharmacy(pharmacy)}
+                                      onMouseLeave={() => setHoveredPharmacy(null)}
+                                    >
                                         <PharmacyCard 
                                             pharmacy={pharmacy} 
                                         />
@@ -114,7 +120,7 @@ export default function Home() {
                         )}
                     </div>
                     <aside className="hidden lg:block sticky top-24">
-                        <MapDisplay />
+                        <MapDisplay pharmacy={hoveredPharmacy}/>
                     </aside>
                 </div>
             ) : (
