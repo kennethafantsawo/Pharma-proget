@@ -29,7 +29,6 @@ export default function Home() {
     isLastWeek,
   } = usePharmacies();
   
-  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredPharmacies = useMemo(() => {
@@ -100,7 +99,7 @@ export default function Home() {
                         {filteredPharmacies.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredPharmacies.map((pharmacy) => (
-                                    <div key={pharmacy.nom} onMouseEnter={() => setSelectedPharmacy(pharmacy)} onMouseLeave={() => setSelectedPharmacy(null)}>
+                                    <div key={pharmacy.nom}>
                                         <PharmacyCard pharmacy={pharmacy} />
                                     </div>
                                 ))}
@@ -116,7 +115,7 @@ export default function Home() {
                         )}
                     </div>
                     <aside className="hidden lg:block sticky top-24">
-                        <MapDisplay pharmacies={currentSchedule.pharmacies} selectedPharmacyName={selectedPharmacy?.nom}/>
+                        <MapDisplay />
                     </aside>
                 </div>
             ) : (
