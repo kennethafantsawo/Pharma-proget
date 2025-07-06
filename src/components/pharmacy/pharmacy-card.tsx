@@ -27,6 +27,8 @@ const WhatsAppIcon = () => (
 
 export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   const whatsAppNumber = pharmacy.contact2.startsWith('+') ? pharmacy.contact2.substring(1) : pharmacy.contact2;
+  const mapQuery = encodeURIComponent(`${pharmacy.nom}, ${pharmacy.localisation}`);
+  const mapUrl = `https://www.openstreetmap.org/search?query=${mapQuery}`;
 
   return (
     <Card 
@@ -38,10 +40,15 @@ export function PharmacyCard({ pharmacy }: PharmacyCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-start gap-3 text-muted-foreground">
-          <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
-          <span className="font-body">{pharmacy.localisation}</span>
-        </div>
+        <a 
+          href={mapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-start gap-3 text-muted-foreground transition-colors hover:text-primary group"
+        >
+          <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5 text-primary/70 transition-colors group-hover:text-primary" />
+          <span className="font-body group-hover:underline">{pharmacy.localisation}</span>
+        </a>
         <div className="flex flex-wrap gap-2 pt-2">
           <Button asChild size="sm">
             <a href={`tel:${pharmacy.contact1}`}>
