@@ -5,18 +5,12 @@ workflows:
     instance_type: linux
     environment:
       node: latest
-      android: true
     scripts:
-      - name: Install deps
-        script: npm ci
-      - name: Build web
-        script: npm run build
-      - name: Capacitor sync Android
-        script: npx cap sync android
-      - name: Build APK
-        script: |
-          cd android
-          ./gradlew assembleDebug
+      - npm ci
+      - npm run build
+      - npx cap sync android
+      - cd android
+      - ./gradlew assembleDebug
     artifacts:
       - android/app/build/outputs/**/*.apk
 
@@ -29,18 +23,12 @@ workflows:
       xcode: 15.4
       cocoapods: default
     scripts:
-      - name: Install deps
-        script: npm ci
-      - name: Build web
-        script: npm run build
-      - name: Capacitor sync iOS
-        script: npx cap sync ios
-      - name: Cocoapods install
-        script: cd ios/App && pod install
-      - name: Build IPA
-        script: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -derivedDataPath ../build -archivePath ../build/App.xcarchive archive
-          xcodebuild -exportArchive -archivePath ../build/App.xcarchive -exportPath ../build -exportOptionsPlist ExportOptions.plist
+      - npm ci
+      - npm run build
+      - npx cap sync ios
+      - cd ios/App && pod install
+      - cd ios/App
+      - xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -derivedDataPath ../build -archivePath ../build/App.xcarchive archive
+      - xcodebuild -exportArchive -archivePath ../build/App.xcarchive -exportPath ../build -exportOptionsPlist ExportOptions.plist
     artifacts:
       - ios/build/**/*.ipa
