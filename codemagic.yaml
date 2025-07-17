@@ -1,14 +1,12 @@
 workflows:
-  android-apk:
-    name: Android Capacitor APK
-    instance_type: mac_mini_m2        # gratuit
-    max_build_duration: 30
+  android-apk-unsigned:
+    name: Android APK (unsigned, for direct share)
+    instance_type: mac_mini_m2      # gratuit
+    max_build_duration: 20
     environment:
       node: 18.18
-      groups:
-        - keystore_credentials         # contiendra KEYSTORE, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
     scripts:
-      - name: Install deps & build web
+      - name: Install & build web
         script: |
           npm ci
           npm run build
@@ -19,46 +17,9 @@ workflows:
           npx cap init PharmaApp com.pharmapp.app --web-dir out
           npx cap add android
           npx cap sync android
-      - name: Build signed APK
+      - name: Build unsigned APK
         script: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleDebug
     artifacts:
-      - android/app/build/outputs/apk/release/*.apk
-
-  ios-ipa:
-    name: iOS Capacitor IPA
-    instance_type: mac_mini_m2        # gratuit
-    max_build_duration: 30
-    environment:
-      node: 18.18
-      xcode: 15.2
-      groups:
-        - ios_credentials              # contiendra APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY, CERTIFICATE_PRIVATE_KEY
-    scripts:
-      - name: Install deps & build web
-        script: |
-          npm ci
-          npm run build
-          npx next export
-      - name: Add Capacitor iOS
-        script: |
-          npm install @capacitor/core @capacitor/ios
-          npx cap init PharmaApp com.pharmapp.app --web-dir out
-          npx cap add ios
-          npx cap sync ios
-      - name: Build signed IPA
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "com.pharmapp.app" \
-            --type IOS_APP_ADHOC \
-            --create
-          keychain add-certificates
-          cd ios
-          xcode-project use-profiles
-          xcode-project build-ipa \
-            --workspace "App.xcworkspace" \
-            --scheme "App" \
-            --config Release
-    artifacts:
-      - ios/build/ipa/*.ipa
+      - android/app/build/outputs/apk/debug/app-debug.apk
