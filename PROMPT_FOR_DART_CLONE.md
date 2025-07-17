@@ -170,7 +170,7 @@ Utilisez une navigation par onglets en bas de l'écran (`BottomNavigationBar`) p
             *   Un formulaire pour créer une nouvelle fiche (titre, contenu, image, date de publication).
             *   Une liste des fiches existantes, chacune avec des boutons pour "Modifier" et "Supprimer".
 *   **Logique :**
-    *   Le mot de passe est `kenneth18`.
+    *   Le mot de passe est ``.
     *   Toutes les actions (créer, mettre à jour, supprimer) doivent appeler les **Server Actions Next.js** correspondantes via HTTP POST, en incluant le mot de passe dans le corps de la requête pour validation côté serveur.
     *   **Mise à jour des pharmacies :** Le fichier JSON sélectionné est lu, son contenu est envoyé au backend qui se charge de vider et de remplir les tables `weeks` et `pharmacies`.
     *   Les formulaires de création/modification de fiches santé doivent gérer l'upload d'images vers Supabase Storage.
